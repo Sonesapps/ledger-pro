@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="color-scheme" content="dark"/>
+<meta name="theme-color" content="#0f1117"/>
+<meta name="theme-color" content="#0f1117"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Ledger Pro"/>
+<title>Ledger Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#0f1117}
+body{font-family:'Georgia','Times New Roman',serif;background:#0f1117;color:#e8e0d0;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#1a1d27}::-webkit-scrollbar-thumb{background:#3a3f55;border-radius:2px}
+input,select,textarea,button{font-family:inherit;outline:none}
+/* Layout */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:200px;background:#0c0e15;border-right:1px solid #1e2235;display:flex;flex-direction:column;padding:16px 10px;gap:3px;flex-shrink:0;overflow-y:auto}
+#main{flex:1;overflow-y:auto;padding:24px 20px}
+/* Sidebar */
+.logo{padding:0 6px 18px;border-bottom:1px solid #1e2235;margin-bottom:8px}
+.logo-sub{font-size:10px;letter-spacing:.15em;color:#6b7090;text-transform:uppercase;margin-bottom:3px}
+.logo-title{font-size:18px;color:#d4af6a;font-style:italic;font-weight:bold}
+.nav-btn{background:none;border:none;cursor:pointer;padding:9px 14px;border-radius:6px;color:#8a8fa8;font-size:12px;letter-spacing:.04em;display:flex;align-items:center;gap:7px;transition:all .2s;white-space:nowrap;width:100%;text-align:left}
+.nav-btn:hover{background:#1e2235;color:#e8e0d0}
+.nav-btn.active{background:#1e2235;color:#d4af6a;border-left:2px solid #d4af6a}
+.nav-section{font-size:9px;color:#3a3f55;text-transform:uppercase;letter-spacing:.1em;padding:10px 14px 4px;margin-top:4px}
+/* Cards & Buttons */
+.card{background:#161921;border:1px solid #252836;border-radius:12px;padding:18px}
+.acct-card{background:#161921;border:1px solid #252836;border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.acct-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--c)}
+.acct-card:hover{border-color:#3a3f55;transform:translateY(-1px)}
+.btn{border:none;border-radius:8px;padding:9px 18px;font-size:12px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;font-family:inherit;letter-spacing:.04em;white-space:nowrap}
+.btn-gold{background:#d4af6a;color:#0f1117;font-weight:bold}.btn-gold:hover{background:#e8c97e}
+.btn-ghost{background:none;border:1px solid #2e3347;color:#8a8fa8}.btn-ghost:hover{border-color:#d4af6a;color:#d4af6a}
+.btn-green{background:#1a2a1a;border:1px solid #2a4a2a;color:#4ade80}.btn-green:hover{background:#1e3a1e}
+.btn-red{background:none;border:1px solid #4a1e1e;color:#e05454;padding:6px 11px}.btn-red:hover{background:#2a1212}
+.btn-blue{background:#1a1e2e;border:1px solid #2a3060;color:#6b8eff}.btn-blue:hover{background:#1e2540}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-camera{background:#d4af6a;color:#0f1117;border:none;border-radius:16px;padding:18px 28px;font-size:16px;font-weight:bold;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:inherit;width:100%;justify-content:center;margin-bottom:12px}
+/* Forms */
+.field-label{font-size:10px;letter-spacing:.08em;color:#6b7090;text-transform:uppercase;margin-bottom:5px;display:block}
+.field-input{width:100%;background:#0f1117;border:1px solid #252836;border-radius:8px;padding:9px 13px;color:#e8e0d0;font-size:13px;transition:border .2s}
+.field-input:focus{border-color:#d4af6a}
+select.field-input option{background:#1a1d27}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+/* Tax hint */
+.tax-hint{font-size:10px;color:#6b8eff;margin-top:4px;padding:6px 10px;background:#0f1420;border-radius:6px;border-left:2px solid #2a3060;display:none}
+/* Tables */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:10px;color:#6b7090;text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;border-bottom:1px solid #252836;text-align:left;font-weight:normal}
+.tbl td{padding:10px 12px;border-bottom:1px solid #1e2235;font-size:12px;color:#c8c0b0;vertical-align:middle}
+.tbl tr:hover td{background:#1a1d27}
+/* Modals */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px)}
+.modal{background:#161921;border:1px solid #2e3347;border-radius:16px;padding:24px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto}
+.modal-lg{max-width:740px}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-title{font-size:15px;color:#d4af6a}
+/* Badges & Dots */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;background:#1e2235;color:#8a8fa8;white-space:nowrap}
+.badge-red{background:#3a1010;color:#f87171}
+.badge-green{background:#103a10;color:#4ade80}
+.badge-gold{background:#2a1e05;color:#d4af6a}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.alert-dot{width:8px;height:8px;border-radius:50%;background:#f87171;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* Receipt */
+.receipt-zone{border:2px dashed #2e3347;border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s}
+.receipt-zone:hover,.receipt-zone.drag{border-color:#d4af6a;background:rgba(212,175,106,.04)}
+/* AI confirm box */
+.ai-confirm{background:#0f1a2a;border:1px solid #1e3a5a;border-radius:10px;padding:16px;margin-bottom:14px}
+.ai-confirm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1e2a3a;font-size:12px}
+.ai-confirm-row:last-child{border-bottom:none}
+/* Toast */
+#toast{position:fixed;bottom:20px;right:20px;background:#1e2235;border:1px solid #2e3347;border-radius:10px;padding:11px 18px;font-size:12px;z-index:500;display:none;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .3s ease;max-width:320px}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* Progress */
+.progress-bar{height:5px;background:#1e2235;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s}
+/* Reconcile */
+.recon-miss{background:#2a1a1a;border:1px solid #3a1e1e;border-radius:8px;padding:12px;margin-bottom:8px}
+.recon-warn{background:#2a2010;border:1px solid #3a2a10;border-radius:8px;padding:12px;margin-bottom:8px}
+.recon-ok{background:#1a2a1a;border:1px solid #1e3a1e;border-radius:8px;padding:12px;margin-bottom:8px}
+/* Setup */
+#setup-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:#0f1117;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.setup-box{background:#161921;border:1px solid #252836;border-radius:16px;padding:28px;width:100%;max-width:480px}
+/* AI overlay */
+#ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.ai-spinner{width:52px;height:52px;border:3px solid #252836;border-top-color:#d4af6a;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Mobile */
+#mobile-tabs{display:none;background:#0c0e15;border-top:1px solid #1e2235;padding:6px 0 env(safe-area-inset-bottom,6px);flex-shrink:0}
+.mobile-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:#4a5070;font-size:9px;cursor:pointer;padding:5px 0;transition:color .2s;position:relative}
+.mobile-tab.active,.mobile-tab:hover{color:#d4af6a}
+.tab-badge{position:absolute;top:2px;right:calc(50% - 16px);background:#f87171;color:#fff;font-size:8px;border-radius:10px;padding:1px 5px;font-weight:bold}
+/* Page header */
+.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:bold;color:#e8e0d0;font-style:italic}
+.page-sub{font-size:11px;color:#6b7090;margin-top:2px}
+/* Grids */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+/* Utilities */
+.flex{display:flex}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.items-center{align-items:center}.justify-between{justify-content:space-between}.wrap{flex-wrap:wrap}
+.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}
+.text-gold{color:#d4af6a}.text-green{color:#4ade80}.text-red{color:#f87171}.text-blue{color:#6b8eff}
+.text-dim{color:#6b7090}.text-sm{font-size:11px}.text-xs{font-size:10px}.bold{font-weight:bold}
+.view{display:none}.view.active{display:block}
+/* Unreconciled banner */
+.unrecon-banner{background:#2a1a0a;border:1px solid #5a3010;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+/* Receipt grid */
+.receipt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.receipt-thumb{background:#161921;border:1px solid #252836;border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s}
+.receipt-thumb:hover{border-color:#d4af6a;transform:translateY(-1px)}
+.receipt-thumb img{width:100%;height:100px;object-fit:cover;display:block}
+.receipt-thumb-info{padding:8px;font-size:10px;color:#6b7090}
+/* Import row */
+.import-row{background:#0f1420;border:1px solid #1e2a40;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+@media(max-width:640px){
+  #sidebar{display:none}
+  #mobile-tabs{display:flex}
+  #main{padding:14px 12px;padding-bottom:80px}
+  .form-grid{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .grid-2{grid-template-columns:1fr}
+  .page-title{font-size:18px}
+  .modal{padding:18px}
+}
+
+/* ── WIZARD ──────────────────────────────────────────────────── */
+.wiz-progress-bar{height:4px;background:#1e2235;border-radius:2px;margin-bottom:24px;overflow:hidden}
+.wiz-progress-fill{height:100%;background:linear-gradient(90deg,#d4af6a,#e8c97e);border-radius:2px;transition:width .4s ease}
+.wiz-acct-type-btn{background:#0f1117;border:1px solid #252836;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.wiz-acct-type-btn:hover{border-color:#d4af6a;background:#161921}
+.wiz-color-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:outline .15s;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<!-- ═══ ONBOARDING WIZARD ═══════════════════════════════════════ -->
+<div id="setup-screen">
+
+  <!-- STEP 0: WELCOME -->
+  <div id="wiz-0" class="setup-box" style="max-width:520px;background:#161921;color:#e8e0d0">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:56px;margin-bottom:10px">💰</div>
+      <div style="font-size:26px;color:#d4af6a;font-style:italic;font-weight:bold;margin-bottom:6px">Welcome to Ledger Pro</div>
+      <div style="font-size:13px;color:#8a8fa8;line-height:1.7">Your all-in-one business banking, receipts,<br/>and tax tracking app — built for small business owners.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div style="background:#0f1117;border:1px solid #1e2235;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">📷</div>
+        <div><div style="font-size:12px;font-weight:bold;color:#e8e0d0;margin-bottom:2px">AI Receipt Scanning</div><div style="font-size:11px;color:#6b7090">Snap a photo — AI reads vendor, amount &amp; tax category</div></div>
+      </div>
+      <div style="background:#0f1117;border:1px solid #1e2235;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">⚖️</div>
+        <div><div style="font-size:12px;font-weight:bold;color:#e8e0d0;margin-bottom:2px">Bank Reconciliation</div><div style="font-size:11px;color:#6b7090">Upload your bank CSV — mismatches flagged instantly</div></div>
+      </div>
+      <div style="background:#0f1117;border:1px solid #1e2235;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">🏷️</div>
+        <div><div style="font-size:12px;font-weight:bold;color:#e8e0d0;margin-bottom:2px">Tax Ready</div><div style="font-size:11px;color:#6b7090">IRS Schedule C categories with deduction hints built in</div></div>
+      </div>
+      <div style="background:#0f1117;border:1px solid #1e2235;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:24px">🚗</div>
+        <div><div style="font-size:12px;font-weight:bold;color:#e8e0d0;margin-bottom:2px">Vehicle &amp; Mileage Tracking</div><div style="font-size:11px;color:#6b7090">Mileage log, repair history, IRS deduction at $0.70/mile</div></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#6b7090;text-align:center;margin-bottom:16px">Setup takes about 2 minutes. You can always change things later.</div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:14px;padding:14px" onclick="wizStep(1)">Let's Get Started →</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:12px" onclick="wizSkip()">Skip setup — take me straight in</button>
+  </div>
+
+  <!-- STEP 1: BUSINESS NAME -->
+  <div id="wiz-1" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:20%"></div></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:8px">🏢</div>
+      <div style="font-size:18px;color:#d4af6a;font-weight:bold;margin-bottom:6px">What's your business name?</div>
+      <div style="font-size:12px;color:#6b7090">This personalizes your app and appears on reports</div>
+    </div>
+    <div class="form-group" style="margin-bottom:20px">
+      <input class="field-input" id="wiz-biz-name" placeholder="e.g. Smith Landscaping, Johnson Electric…" style="font-size:14px;padding:13px;text-align:center"/>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:13px;padding:13px" onclick="wizSaveBizName()">Continue →</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:11px" onclick="wizStep(2)">Skip this step</button>
+  </div>
+
+  <!-- STEP 2: ADD ACCOUNTS INTRO -->
+  <div id="wiz-2" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:40%"></div></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:8px">🏦</div>
+      <div style="font-size:18px;color:#d4af6a;font-weight:bold;margin-bottom:6px">Let's add your bank accounts</div>
+      <div style="font-size:12px;color:#8a8fa8;line-height:1.7">We'll add your checking accounts, savings accounts, and credit cards one at a time.<br/><br/>Have your bank app or last statement handy so you know your current balances.</div>
+    </div>
+    <div style="background:#0f1117;border:1px solid #252836;border-radius:10px;padding:14px;margin-bottom:20px">
+      <div style="font-size:10px;color:#d4af6a;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase">You'll need for each account:</div>
+      <div style="font-size:12px;color:#8a8fa8;line-height:2">✓ Bank name (Chase, Capital One, etc.)<br/>✓ Account nickname<br/>✓ Last 4 digits of account number<br/>✓ Current balance (log into your bank to check)<br/>✓ Credit limit (credit cards only)</div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:13px;padding:13px" onclick="wizStep(3)">Add My First Account →</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:11px" onclick="wizStep(5)">Skip — I'll add accounts later</button>
+  </div>
+
+  <!-- STEP 3: ACCOUNT TYPE -->
+  <div id="wiz-3" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:55%"></div></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:8px">🏦</div>
+      <div style="font-size:18px;color:#d4af6a;font-weight:bold;margin-bottom:6px">What type of account is this?</div>
+      <div style="font-size:11px;color:#6b7090">Account <span id="wiz-acct-num">1</span> of your setup</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <button class="wiz-acct-type-btn" onclick="wizSelectType('checking')">
+        <div style="font-size:22px">🏧</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Checking Account</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Day-to-day business spending</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="wizSelectType('savings')">
+        <div style="font-size:22px">🐖</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Savings Account</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Reserve funds, tax savings</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="wizSelectType('credit')">
+        <div style="font-size:22px">💳</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Credit Card</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Business credit card</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="wizSelectType('loan')">
+        <div style="font-size:22px">🏦</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Loan / Line of Credit</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Business loan or line of credit</div></div>
+      </button>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:11px" onclick="wizStep(5)">Done adding accounts</button>
+  </div>
+
+  <!-- STEP 4: ACCOUNT DETAILS -->
+  <div id="wiz-4" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:70%"></div></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:30px;margin-bottom:6px" id="wiz-type-icon">🏧</div>
+      <div style="font-size:16px;color:#d4af6a;font-weight:bold;margin-bottom:4px" id="wiz-type-label">Checking Account Details</div>
+      <div style="font-size:11px;color:#6b7090">Fill in what you know — you can edit this anytime</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+      <div class="form-group">
+        <label class="field-label">Bank / Institution Name</label>
+        <input class="field-input" id="wiz-bank" placeholder="Chase, Capital One, Wells Fargo, Bank of America…"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Which bank is this account with?</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Account Nickname</label>
+        <input class="field-input" id="wiz-acct-name" placeholder="e.g. Chase Business Checking, BofA Savings…"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Give it a name you'll recognize</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Last 4 Digits of Account Number</label>
+        <input class="field-input" id="wiz-last4" maxlength="4" placeholder="1234" style="letter-spacing:.2em"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Found on your card or bank statement</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label" id="wiz-bal-label">Current Balance ($)</label>
+        <input class="field-input" type="number" step="0.01" id="wiz-balance" placeholder="0.00"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px" id="wiz-bal-hint">Log into your bank to find your current balance. Enter 0 to start fresh.</div>
+      </div>
+      <div class="form-group" id="wiz-limit-group" style="display:none">
+        <label class="field-label">Credit Limit ($)</label>
+        <input class="field-input" type="number" step="0.01" id="wiz-limit" placeholder="10000"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">The total credit limit on this card</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Account Color</label>
+        <div class="flex gap-8 wrap" id="wiz-colors"></div>
+        <input type="hidden" id="wiz-color" value="#2563eb"/>
+      </div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:13px;padding:13px" onclick="wizSaveAccount()">Save Account →</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;font-size:11px" onclick="wizStep(3)">← Back</button>
+  </div>
+
+  <!-- STEP 5: GOOGLE DRIVE -->
+  <div id="wiz-5" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:85%"></div></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:8px">☁️</div>
+      <div style="font-size:18px;color:#d4af6a;font-weight:bold;margin-bottom:6px">Back up to Google Drive?</div>
+      <div style="font-size:12px;color:#8a8fa8;line-height:1.7">Saving to Google Drive means your data and receipts are safe even if you clear your browser or switch devices.<br/><br/>It's free and uses your existing Google account.</div>
+    </div>
+    <div style="background:#0f1117;border:1px solid #252836;border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:10px;color:#d4af6a;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase">Already have a Client ID?</div>
+      <input class="field-input" id="cid-input" placeholder="xxxxxx.apps.googleusercontent.com" style="font-size:11px;margin-bottom:8px"/>
+      <div style="font-size:10px;color:#6b7090">Don't have one yet? <a href="https://console.cloud.google.com" target="_blank" style="color:#6b8eff">Get it free at console.cloud.google.com</a></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:13px;padding:13px;margin-bottom:8px" onclick="wizFinish(true)">☁ Connect Google Drive &amp; Finish</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px" onclick="wizFinish(false)">Skip — save locally for now</button>
+  </div>
+
+  <!-- STEP 6: ALL DONE -->
+  <div id="wiz-6" class="setup-box" style="display:none;max-width:480px">
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" style="width:100%"></div></div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:56px;margin-bottom:10px">🎉</div>
+      <div style="font-size:20px;color:#d4af6a;font-weight:bold;margin-bottom:8px">You're all set!</div>
+      <div style="font-size:12px;color:#8a8fa8" id="wiz-done-biz"></div>
+    </div>
+    <div id="wiz-acct-summary" style="margin-bottom:20px"></div>
+    <div style="background:#0f1117;border:1px solid #252836;border-radius:10px;padding:14px;margin-bottom:20px">
+      <div style="font-size:11px;color:#8a8fa8;line-height:2">
+        <div>📷 <strong style="color:#e8e0d0">Add Transaction</strong> — snap a receipt to get started</div>
+        <div>⚖️ <strong style="color:#e8e0d0">Reconcile</strong> — upload your bank CSV to match transactions</div>
+        <div>☁ <strong style="color:#e8e0d0">Sync Drive</strong> — bottom left sidebar to save your data</div>
+      </div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:14px;padding:14px" onclick="wizEnterApp()">Enter Ledger Pro →</button>
+  </div>
+
+</div>
+
+<!-- AI OVERLAY -->
+<div id="ai-overlay">
+  <div class="ai-spinner"></div>
+  <div style="color:#d4af6a;font-size:15px;font-weight:bold">Reading Receipt…</div>
+  <div style="color:#6b7090;font-size:11px">AI is extracting transaction details</div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;flex-direction:column;height:100vh;background:#0f1117">
+  <div style="display:flex;flex:1;overflow:hidden">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <div class="logo">
+        <div class="logo-sub">Business</div>
+        <div class="logo-title">Ledger Pro</div>
+      </div>
+      <div class="nav-section">Banking</div>
+      <button class="nav-btn active" onclick="showView('dashboard')" id="nb-dashboard">📊 Dashboard</button>
+      <button class="nav-btn" onclick="showView('quick-add')" id="nb-quick-add">📷 Quick Add</button>
+      <button class="nav-btn" onclick="showView('transactions')" id="nb-transactions">📋 All Transactions</button>
+      <button class="nav-btn" onclick="showView('accounts')" id="nb-accounts">🏦 Accounts</button>
+      <div class="nav-section">Receipts & Statements</div>
+      <button class="nav-btn" onclick="showView('receipts')" id="nb-receipts">🖼 Receipt Vault</button>
+      <button class="nav-btn" onclick="showView('reconcile')" id="nb-reconcile">⚖️ Reconcile</button>
+      <button class="nav-btn" onclick="showView('statements')" id="nb-statements">📄 Statements</button>
+      <div class="nav-section">Tax &amp; Vendors</div>
+      <button class="nav-btn" onclick="showView('taxes')" id="nb-taxes">🏷️ Tax Summary</button>
+      <button class="nav-btn" onclick="showView('vendors')" id="nb-vendors">👤 Vendors / 1099</button>
+      <div class="nav-section">Fleet</div>
+      <button class="nav-btn" onclick="showView('vehicles')" id="nb-vehicles">🚗 Vehicles</button>
+      <button class="nav-btn" onclick="showView('mileage')" id="nb-mileage">📍 Mileage</button>
+      <div style="margin-top:auto;padding:12px 8px 0;border-top:1px solid #1e2235">
+        <div id="sb-stats" style="font-size:10px;color:#4a5070;line-height:1.9"></div>
+        <button id="sync-btn" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;display:none" onclick="syncDrive()">☁ Sync Drive</button>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main id="main">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-hdr">
+          <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-sub"></div></div>
+          <button class="btn btn-gold" onclick="showView('quick-add')">📷 Add Transaction</button>
+        </div>
+        <div id="unrecon-banner"></div>
+        <div class="grid-auto mb-20" id="acct-cards"></div>
+        <div class="grid-3 mb-20" id="kpi-cards"></div>
+        <div class="card">
+          <div class="flex justify-between items-center mb-16">
+            <div class="text-gold" style="font-size:13px">Recent Transactions</div>
+            <button class="btn btn-ghost btn-sm" onclick="showView('transactions')">View All</button>
+          </div>
+          <div id="recent-tx"></div>
+        </div>
+      </div>
+
+      <!-- QUICK ADD (camera-first) -->
+      <div class="view" id="view-quick-add">
+        <div class="page-hdr"><div><div class="page-title">Add Transaction</div><div class="page-sub">Snap a receipt — AI fills in the details automatically</div></div></div>
+        <div style="max-width:620px">
+          <button class="btn-camera" onclick="openCamera()">📷 Take Receipt Photo</button>
+          <div style="text-align:center;font-size:11px;color:#4a5070;margin-bottom:16px">— or upload an image / enter manually below —</div>
+          <div class="card"><div id="tx-form"></div></div>
+        </div>
+      </div>
+
+      <!-- ALL TRANSACTIONS -->
+      <div class="view" id="view-transactions">
+        <div class="page-hdr">
+          <div><div class="page-title">All Transactions</div><div class="page-sub" id="tx-count-sub"></div></div>
+          <button class="btn btn-gold" onclick="showView('quick-add')">+ Add</button>
+        </div>
+        <div class="card mb-16">
+          <div class="flex gap-8 wrap">
+            <select class="field-input" id="filter-acct" style="flex:1" onchange="renderAllTx()"><option value="">All Accounts</option></select>
+            <select class="field-input" id="filter-cat" style="flex:1" onchange="renderAllTx()"><option value="">All Categories</option></select>
+            <input class="field-input" id="filter-search" style="flex:2" placeholder="Search description…" oninput="renderAllTx()"/>
+          </div>
+        </div>
+        <div class="card"><div id="all-tx-list"></div></div>
+      </div>
+
+      <!-- ACCOUNTS -->
+      <div class="view" id="view-accounts">
+        <div class="page-hdr"><div><div class="page-title">Accounts</div></div><button class="btn btn-gold" onclick="openAccountModal()">+ Add Account</button></div>
+        <div id="accounts-list"></div>
+      </div>
+
+      <!-- RECEIPT VAULT -->
+      <div class="view" id="view-receipts">
+        <div class="page-hdr"><div><div class="page-title">Receipt Vault</div><div class="page-sub">All receipts stored for tax audit</div></div></div>
+        <div id="receipt-stats" class="flex gap-12 wrap mb-16"></div>
+        <div id="receipt-grid"></div>
+      </div>
+
+      <!-- RECONCILE -->
+      <div class="view" id="view-reconcile">
+        <div class="page-hdr"><div><div class="page-title">Reconcile</div><div class="page-sub">Match your bank statement to your ledger</div></div></div>
+        <div class="card mb-16">
+          <div style="font-size:13px;color:#d4af6a;margin-bottom:10px">Upload Bank Statement</div>
+          <div style="font-size:11px;color:#8a8fa8;margin-bottom:4px">Supported banks: <span style="color:#4ade80">Chase · Capital One · Bank of America · Wells Fargo</span> and most other banks.</div>
+          <div style="font-size:11px;color:#8a8fa8;margin-bottom:14px">Export a CSV from your bank website, upload here — mismatches are flagged instantly.</div>
+          <div class="flex gap-8 items-center wrap">
+            <select class="field-input" id="recon-acct" style="flex:1;max-width:260px"></select>
+            <label class="btn btn-blue" style="cursor:pointer">📂 Choose CSV <input type="file" accept=".csv" style="display:none" onchange="handleReconFile(this)"/></label>
+          </div>
+        </div>
+        <div id="recon-results"></div>
+      </div>
+
+      <!-- STATEMENTS -->
+      <div class="view" id="view-statements">
+        <div class="page-hdr"><div><div class="page-title">Statements</div></div><button class="btn btn-green" onclick="exportFullYear()">⬇ Full Year CSV</button></div>
+        <div id="statements-grid"></div>
+      </div>
+
+      <!-- TAXES -->
+      <div class="view" id="view-taxes">
+        <div class="page-hdr"><div><div class="page-title">Tax Summary</div><div class="page-sub">IRS Schedule C</div></div>
+          <select class="field-input" id="tax-yr" style="width:auto" onchange="renderTaxes()"></select>
+        </div>
+        <div class="grid-3 mb-20" id="tax-kpis"></div>
+        <div class="card" id="tax-table"></div>
+      </div>
+
+      <!-- VEHICLES -->
+      <div class="view" id="view-vehicles">
+        <div class="page-hdr"><div><div class="page-title">Vehicles</div></div><button class="btn btn-gold" onclick="openVehicleModal()">+ Add Vehicle</button></div>
+        <div id="vehicles-list"></div>
+      </div>
+
+      <!-- MILEAGE -->
+      <div class="view" id="view-mileage">
+        <div class="page-hdr"><div><div class="page-title">Mileage Log</div><div class="page-sub">IRS rate: $0.70/mile (2026)</div></div><button class="btn btn-gold" onclick="openMileageModal()">+ Log Trip</button></div>
+        <div class="grid-3 mb-20" id="mi-kpis"></div>
+        <div class="card" id="mi-table"></div>
+      </div>
+
+
+      <!-- VENDORS / 1099 -->
+      <div class="view" id="view-vendors">
+        <div class="page-hdr">
+          <div><div class="page-title">Vendors &amp; 1099</div><div class="page-sub">Track contractor &amp; vendor payments · IRS 1099-NEC threshold: $600</div></div>
+          <button class="btn btn-gold" onclick="openVendorModal()">+ Add Vendor</button>
+        </div>
+        <div id="vendor-1099-banner"></div>
+        <div class="grid-3 mb-16" id="vendor-kpis"></div>
+        <div id="vendors-list"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MOBILE TABS -->
+  <nav id="mobile-tabs">
+    <button class="mobile-tab active" onclick="showView('dashboard')" id="mt-dashboard">📊<br>Home</button>
+    <button class="mobile-tab" onclick="showView('quick-add')" id="mt-quick-add">📷<br>Add</button>
+    <button class="mobile-tab" onclick="showView('receipts')" id="mt-receipts">🖼<br>Receipts</button>
+    <button class="mobile-tab" onclick="showView('reconcile')" id="mt-reconcile">⚖️<br>Reconcile</button>
+    <button class="mobile-tab" onclick="showView('taxes')" id="mt-taxes">🏷️<br>Taxes</button>
+  </nav>
+</div>
+
+<div id="toast"><span id="tdot" class="dot"></span><span id="tmsg"></span></div>
+<div id="mroot"></div>
+
+<script>
+// ═══ CONSTANTS ═══════════════════════════════════════════════════
+const IRS_RATE = 0.70;
+const CY = new Date().getFullYear();
+const CM = new Date().getMonth();
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const COLORS = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#db2777','#059669','#ea580c'];
+
+const TAX_CATS = [
+  'Income','Advertising & Marketing','Auto & Truck Expenses','Business Meals (50%)',
+  'Commissions & Fees','Contract Labor','Depreciation','Employee Benefits',
+  'Insurance (Business)','Interest (Business)','Legal & Professional Fees',
+  'Office Expenses','Other Business Expenses','Payroll / Wages','Rent / Lease',
+  'Repairs & Maintenance','Software / Tech','Supplies','Taxes & Licenses',
+  'Travel','Utilities','Non-Deductible / Personal','Transfer','Uncategorized'
+];
+
+const TAX_HINTS = {
+  'Income': 'All revenue received for services or goods sold.',
+  'Advertising & Marketing': '100% deductible. Includes ads, flyers, website, social media.',
+  'Auto & Truck Expenses': 'Business use only. Keep mileage log. Cannot combine with standard mileage deduction.',
+  'Business Meals (50%)': 'Only 50% deductible. Must have business purpose. Keep receipt + note who attended.',
+  'Commissions & Fees': '100% deductible. Paid to non-employees for services.',
+  'Contract Labor': '100% deductible. Issue 1099-NEC if paid $600+ to one person.',
+  'Depreciation': 'For assets over $2,500. Section 179 may allow full-year deduction.',
+  'Employee Benefits': 'Health insurance, retirement plans. 100% deductible.',
+  'Insurance (Business)': '100% deductible. Business liability, property, vehicle (business use).',
+  'Interest (Business)': 'Interest on business loans/credit cards only. Not personal.',
+  'Legal & Professional Fees': '100% deductible. Attorney, CPA, consultant fees.',
+  'Office Expenses': '100% deductible. Supplies, postage, small equipment under $2,500.',
+  'Other Business Expenses': 'Ordinary and necessary. Be ready to explain to IRS.',
+  'Payroll / Wages': '100% deductible. Includes employer payroll taxes.',
+  'Rent / Lease': '100% deductible. Business space or equipment leases.',
+  'Repairs & Maintenance': '100% deductible. Routine repairs only — not improvements.',
+  'Software / Tech': '100% deductible. Subscriptions, apps, tools used for business.',
+  'Supplies': '100% deductible. Items used up in the year purchased.',
+  'Taxes & Licenses': 'Business licenses, permits, professional dues. Not federal income tax.',
+  'Travel': '100% deductible. Must be away from home overnight. Keep receipts.',
+  'Utilities': 'Business portion only. If home office, use percentage of sq footage.',
+  'Non-Deductible / Personal': 'Not deductible. Personal expenses mixed with business.',
+  'Transfer': 'Between your own accounts — not income or expense.',
+  'Uncategorized': 'Needs a category before filing taxes.'
+};
+
+// Bank CSV column maps — (date, description, amount, debit, credit)
+const BANK_FORMATS = {
+  chase: { date:['transaction date','posting date'], desc:['description'], amount:['amount'], debit:[], credit:[] },
+  capitalone: { date:['transaction date'], desc:['description','transaction description'], amount:['debit','credit'], debit:['debit'], credit:['credit'] },
+  bofa: { date:['date'], desc:['description','payee'], amount:['amount'], debit:[], credit:[] },
+  wellsfargo: { date:['date'], desc:['description'], amount:['amount'], debit:[], credit:[] },
+};
+
+// ═══ DATABASE ════════════════════════════════════════════════════
+let DB = {
+  accounts:[
+    {id:'a1',name:'Chase Checking',type:'checking',balance:12450,institution:'Chase',last4:'4821',color:'#2563eb'},
+    {id:'a2',name:'Capital One Visa',type:'credit',balance:-2340.5,limit:10000,institution:'Capital One',last4:'7733',color:'#dc2626'},
+    {id:'a3',name:'Chase Savings',type:'savings',balance:34800,institution:'Chase',last4:'9901',color:'#16a34a'},
+  ],
+  transactions:[
+    {id:'t1',date:'2026-01-15',desc:'Office Depot - Supplies',amount:-145.32,type:'debit',accountId:'a1',taxCat:'Office Expenses',notes:'',receipt:null,vehicleId:null,reconciled:false},
+    {id:'t2',date:'2026-02-03',desc:'AT&T Business Line',amount:-89.99,type:'debit',accountId:'a2',taxCat:'Utilities',notes:'Monthly',receipt:null,vehicleId:null,reconciled:false},
+    {id:'t3',date:'2026-02-10',desc:'Client Payment - Acme Corp',amount:3500,type:'credit',accountId:'a1',taxCat:'Income',notes:'Invoice #1042',receipt:null,vehicleId:null,reconciled:true},
+    {id:'t4',date:'2026-03-01',desc:'QuickBooks Subscription',amount:-45,type:'debit',accountId:'a2',taxCat:'Software / Tech',notes:'',receipt:null,vehicleId:null,reconciled:false},
+  ],
+  vehicles:[], mileage:[], repairs:[], vendors:[]
+};
+
+let gapiReady = false;
+const fmt = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const fmtD = d => new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const uid = () => Math.random().toString(36).slice(2,10);
+const save = () => { try { localStorage.setItem('lpdb2', JSON.stringify(DB)); } catch(e){} };
+const load = () => { try { const s=localStorage.getItem('lpdb2'); if(s) DB={...DB,...JSON.parse(s)}; } catch(e){} };
+
+// ═══ STARTUP ═════════════════════════════════════════════════════
+function startApp(withDrive) {
+  const cid = document.getElementById('cid-input').value.trim();
+  if (withDrive && !cid) { showToast('Enter Client ID or click Start Now','error'); return; }
+  if (cid) localStorage.setItem('lp_cid', cid);
+  load();
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  boot();
+  if (withDrive && cid) { initGDrive(cid); document.getElementById('sync-btn').style.display='block'; }
+  else if (!withDrive) showToast('Running locally — data saved in browser','info');
+}
+
+function boot() {
+  renderDashboard(); renderTxForm(); renderAllTxFilters(); renderAccounts();
+  renderReceipts(); renderReconUI(); renderStatements(); renderTaxes(); renderVehicles(); renderMileage(); renderVendors();
+  updateSBStats();
+}
+
+// ═══ VIEW ROUTING ════════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn,.mobile-tab').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nb-'+id);
+  const mt = document.getElementById('mt-'+id);
+  if(nb) nb.classList.add('active');
+  if(mt) mt.classList.add('active');
+  const refresh = {
+    dashboard:renderDashboard, 'quick-add':renderTxForm, transactions:renderAllTx,
+    accounts:renderAccounts, receipts:renderReceipts, reconcile:renderReconUI,
+    statements:renderStatements, taxes:renderTaxes, vehicles:renderVehicles, mileage:renderMileage, vendors:renderVendors
+  };
+  if(refresh[id]) refresh[id]();
+}
+
+// ═══ DASHBOARD ═══════════════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('dash-sub').textContent = `Financial overview · ${CY}`;
+  const unrecon = DB.transactions.filter(t=>!t.reconciled).length;
+  document.getElementById('unrecon-banner').innerHTML = unrecon > 0
+    ? `<div class="unrecon-banner" onclick="showView('reconcile')">
+        <span class="alert-dot"></span>
+        <div><div style="font-size:12px;color:#d4af6a;font-weight:bold">${unrecon} unreconciled transaction${unrecon!==1?'s':''}</div>
+        <div style="font-size:10px;color:#8a8fa8;margin-top:2px">Tap to reconcile with your bank statement →</div></div>
+       </div>` : '';
+
+  document.getElementById('acct-cards').innerHTML = DB.accounts.map(a=>{
+    const txs = DB.transactions.filter(t=>t.accountId===a.id);
+    const ytd = txs.filter(t=>t.date.startsWith(String(CY))).reduce((s,t)=>s+t.amount,0);
+    const last = txs.slice().sort((x,y)=>y.date.localeCompare(x.date))[0];
+    const pct = a.type==='credit'&&a.limit ? Math.min(100,Math.abs(a.balance)/a.limit*100) : 0;
+    const hasReceipts = txs.filter(t=>t.receipt).length;
+    return `<div class="acct-card" style="--c:${a.color}" onclick="showAcctDetail('${a.id}')">
+      <div class="flex justify-between mb-12" style="gap:8px">
+        <div><div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">${a.type}</div>
+        <div style="font-size:14px;font-weight:bold;color:#e8e0d0">${a.name}</div>
+        <div class="text-xs" style="color:#4a5070">${a.institution} ···${a.last4||''}</div></div>
+      </div>
+      <div style="font-size:24px;font-weight:bold;color:${a.balance<0?'#f87171':'#e8e0d0'};margin-bottom:10px">${fmt(a.balance)}</div>
+      ${a.type==='credit'&&a.limit?`<div class="progress-bar mb-8"><div class="progress-fill" style="width:${pct}%;background:${a.color}"></div></div><div class="text-xs text-dim">${fmt(Math.abs(a.balance))} of ${fmt(a.limit)} used</div>`:''}
+      <div class="flex justify-between mt-12" style="padding-top:10px;border-top:1px solid #1e2235">
+        <div><div class="text-xs" style="color:#4a5070;text-transform:uppercase">YTD</div><div style="font-size:12px;color:${ytd>=0?'#4ade80':'#f87171'};margin-top:1px">${fmt(ytd)}</div></div>
+        <div style="text-align:right"><div class="text-xs" style="color:#4a5070;text-transform:uppercase">Receipts</div><div class="text-xs" style="color:${hasReceipts?'#d4af6a':'#3a3f55'};margin-top:1px">${hasReceipts} saved</div></div>
+      </div></div>`;
+  }).join('') + `<div class="acct-card" style="--c:#3a3f55;border:1px dashed #2e3347;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:#4a5070;min-height:160px" onclick="openAccountModal()"><div style="font-size:28px">+</div><div class="text-sm">Add Account</div></div>`;
+
+  const ytxs = DB.transactions.filter(t=>t.date.startsWith(String(CY)));
+  const inc = ytxs.filter(t=>t.taxCat==='Income').reduce((s,t)=>s+t.amount,0);
+  const ded = ytxs.filter(t=>!['Income','Transfer','Non-Deductible / Personal','Uncategorized'].includes(t.taxCat)&&t.amount<0).reduce((s,t)=>s+t.amount,0);
+  const assets = DB.accounts.filter(a=>!['credit','loan'].includes(a.type)).reduce((s,a)=>s+a.balance,0);
+  const liab = DB.accounts.filter(a=>['credit','loan'].includes(a.type)).reduce((s,a)=>s+a.balance,0);
+  const rcpts = DB.transactions.filter(t=>t.receipt).length;
+  document.getElementById('kpi-cards').innerHTML = [
+    {l:'Total Assets',v:fmt(assets),c:'#4ade80'},
+    {l:'YTD Income',v:fmt(inc),c:'#4ade80'},
+    {l:'YTD Deductions',v:fmt(Math.abs(ded)),c:'#f87171'},
+    {l:'Est. Net Profit',v:fmt(inc+ded),c:(inc+ded)>=0?'#4ade80':'#f87171'},
+    {l:'Total Liabilities',v:fmt(Math.abs(liab)),c:'#f87171'},
+    {l:'Receipts Saved',v:rcpts+' files',c:'#d4af6a'},
+  ].map(k=>`<div class="card"><div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px">${k.l}</div><div style="font-size:20px;font-weight:bold;color:${k.c}">${k.v}</div></div>`).join('');
+
+  document.getElementById('recent-tx').innerHTML = txTable(DB.transactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10));
+}
+
+// ═══ TRANSACTION TABLE ═══════════════════════════════════════════
+function txTable(txs, hideAcct=false) {
+  if (!txs.length) return '<div style="padding:20px;color:#4a5070;font-size:12px">No transactions.</div>';
+  return `<div style="overflow-x:auto"><table class="tbl"><thead><tr>
+    <th>Date</th><th>Description</th><th>Amount</th><th>Category</th>
+    ${hideAcct?'':'<th>Account</th>'}
+    <th>Status</th><th>Actions</th>
+  </tr></thead><tbody>` +
+  txs.map(tx=>{
+    const a = DB.accounts.find(x=>x.id===tx.accountId);
+    return `<tr>
+      <td class="text-dim" style="white-space:nowrap">${fmtD(tx.date)}</td>
+      <td style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c8c0b0">
+        ${tx.receipt?`<span style="cursor:pointer;color:#d4af6a;margin-right:5px" onclick="viewRcpt('${tx.id}')" title="View receipt">🖼</span>`:''}${tx.desc}</td>
+      <td style="font-weight:bold;color:${tx.amount>=0?'#4ade80':'#f87171'};white-space:nowrap">${tx.amount>=0?'+':''}${fmt(tx.amount)}</td>
+      <td><span class="badge">${tx.taxCat||'—'}</span></td>
+      ${hideAcct?'':` <td>${a?`<div class="flex items-center gap-8"><span class="dot" style="background:${a.color}"></span><span class="text-sm">${a.name}</span></div>`:'—'}</td>`}
+      <td><span class="badge ${tx.reconciled?'badge-green':'badge-red'}">${tx.reconciled?'✓ Matched':'Pending'}</span></td>
+      <td><div class="flex gap-8">
+        <button class="btn btn-ghost btn-sm" onclick="editTx('${tx.id}')">✏</button>
+        <button class="btn btn-red btn-sm" onclick="delTx('${tx.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('') + '</tbody></table></div>';
+}
+
+// ═══ ALL TRANSACTIONS VIEW ════════════════════════════════════════
+function renderAllTxFilters() {
+  const fa = document.getElementById('filter-acct');
+  if (fa) fa.innerHTML = '<option value="">All Accounts</option>' + DB.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  const fc = document.getElementById('filter-cat');
+  if (fc) fc.innerHTML = '<option value="">All Categories</option>' + TAX_CATS.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+
+function renderAllTx() {
+  const acct = document.getElementById('filter-acct')?.value || '';
+  const cat = document.getElementById('filter-cat')?.value || '';
+  const search = (document.getElementById('filter-search')?.value || '').toLowerCase();
+  let txs = DB.transactions.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if (acct) txs = txs.filter(t=>t.accountId===acct);
+  if (cat) txs = txs.filter(t=>t.taxCat===cat);
+  if (search) txs = txs.filter(t=>t.desc.toLowerCase().includes(search)||t.notes?.toLowerCase().includes(search));
+  document.getElementById('tx-count-sub').textContent = `${txs.length} transactions`;
+  document.getElementById('all-tx-list').innerHTML = txTable(txs);
+  renderAllTxFilters();
+}
+
+// ═══ TRANSACTION FORM ════════════════════════════════════════════
+function renderTxForm(init={}) {
+  const ao = DB.accounts.map(a=>`<option value="${a.id}" ${init.accountId===a.id?'selected':''}>${a.name}</option>`).join('');
+  const co = TAX_CATS.map(c=>`<option value="${c}" ${(init.taxCat||'Uncategorized')===c?'selected':''}>${c}</option>`).join('');
+  const vo = '<option value="">— No Vehicle —</option>' + DB.vehicles.map(v=>`<option value="${v.id}" ${init.vehicleId===v.id?'selected':''}>${v.year} ${v.make} ${v.model}</option>`).join('');
+  const vendorOpts = '<option value="">— No Vendor —</option>' + DB.vendors.map(v=>`<option value="${v.id}" ${init.vendorId===v.id?'selected':''}>${v.name}${v.ein?' (EIN: '+v.ein+')':''}</option>`).join('');
+  document.getElementById('tx-form').innerHTML = `
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="form-grid">
+      <div class="form-group"><label class="field-label">Date</label><input class="field-input" type="date" id="fd" value="${init.date||new Date().toISOString().slice(0,10)}"/></div>
+      <div class="form-group"><label class="field-label">Type</label><select class="field-input" id="ft"><option value="debit" ${(init.type||'debit')==='debit'?'selected':''}>Expense / Payment</option><option value="credit" ${init.type==='credit'?'selected':''}>Income / Deposit</option></select></div>
+    </div>
+    <div class="form-group"><label class="field-label">Description</label><input class="field-input" id="fdesc" placeholder="Vendor, payee, or source…" value="${init.desc||''}"/></div>
+    <div class="form-grid">
+      <div class="form-group"><label class="field-label">Amount ($)</label><input class="field-input" type="number" step="0.01" id="famt" placeholder="0.00" value="${init.amount?Math.abs(init.amount):''}"/></div>
+      <div class="form-group"><label class="field-label">Account</label><select class="field-input" id="facct">${ao}</select></div>
+    </div>
+    <div class="form-group">
+      <label class="field-label">IRS Tax Category</label>
+      <select class="field-input" id="fcat" onchange="showTaxHint(this.value)">${co}</select>
+      <div class="tax-hint" id="tax-hint-box"></div>
+    </div>
+    <div class="form-group"><label class="field-label">Vehicle (auto expenses)</label><select class="field-input" id="fveh">${vo}</select></div>
+    <div class="form-group"><label class="field-label">Vendor / Contractor (for 1099 tracking)</label><select class="field-input" id="fvendor">${vendorOpts}</select><div style="font-size:10px;color:#6b7090;margin-top:4px">Link this payment to a vendor to track 1099 totals. Only needed for contractor payments.</div></div>
+    <div class="form-group"><label class="field-label">Notes</label><textarea class="field-input" id="fnotes" rows="2" style="resize:vertical" placeholder="Invoice #, client name, details…">${init.notes||''}</textarea></div>
+    <div class="form-group">
+      <label class="field-label">Receipt Photo</label>
+      <div id="rcpt-area">${init.receipt
+        ? `<img src="${init.receipt}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #2e3347;background:#0f1117;display:block;margin-bottom:8px"/>
+           <div class="flex gap-8"><button class="btn btn-ghost btn-sm" onclick="triggerFile()">🖼 Replace</button><button class="btn btn-red btn-sm" onclick="clearRcpt()">🗑 Remove</button></div>`
+        : `<div class="receipt-zone" onclick="triggerFile()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dropRcpt(event)">
+             <div style="font-size:28px;margin-bottom:6px">📷</div>
+             <div style="font-size:12px;color:#6b7090;margin-bottom:3px">Click here or drag a receipt image</div>
+             <div class="text-xs" style="color:#3a3f55">AI reads vendor, amount, date &amp; tax category automatically</div>
+           </div>`
+      }</div>
+      <input type="file" id="rf" accept="image/*" style="display:none" onchange="handleRcpt(this)"/>
+      <input type="file" id="rf-cam" accept="image/*" capture="environment" style="display:none" onchange="handleRcpt(this)"/>
+    </div>
+    <input type="hidden" id="frcpt" value="${init.receipt||''}"/>
+    <input type="hidden" id="feid" value="${init.id||''}"/>
+    <div class="flex gap-8 justify-between mt-12 wrap">
+      <button class="btn btn-ghost" onclick="showView('dashboard')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveTx()">💾 Save Transaction</button>
+    </div>
+  </div>`;
+  if (init.taxCat) showTaxHint(init.taxCat);
+}
+
+function showTaxHint(cat) {
+  const box = document.getElementById('tax-hint-box');
+  if (!box) return;
+  const hint = TAX_HINTS[cat];
+  if (hint && cat !== 'Uncategorized') { box.style.display='block'; box.textContent='ⓘ '+hint; }
+  else box.style.display='none';
+}
+
+function openCamera() { document.getElementById('rf-cam').click(); }
+function triggerFile() { document.getElementById('rf').click(); }
+
+function saveTx() {
+  const date=document.getElementById('fd').value, desc=document.getElementById('fdesc').value.trim();
+  const raw=parseFloat(document.getElementById('famt').value), type=document.getElementById('ft').value;
+  const accountId=document.getElementById('facct').value, taxCat=document.getElementById('fcat').value;
+  const vehicleId=document.getElementById('fveh').value||null, vendorId=document.getElementById('fvendor')?.value||null, notes=document.getElementById('fnotes').value.trim();
+  const receipt=document.getElementById('frcpt').value||null, eid=document.getElementById('feid').value;
+  if (!date||!desc||isNaN(raw)||!accountId) { showToast('Fill in all required fields','error'); return; }
+  const amount = type==='debit' ? -Math.abs(raw) : Math.abs(raw);
+  const tx = {id:eid||uid(),date,desc,amount,type,accountId,taxCat,vehicleId,vendorId,notes,receipt,reconciled:eid?(DB.transactions.find(t=>t.id===eid)?.reconciled||false):false};
+  if (eid) DB.transactions = DB.transactions.map(t=>t.id===eid?tx:t);
+  else DB.transactions.unshift(tx);
+  save(); renderTxForm(); showView('dashboard'); showToast(eid?'Transaction updated':'Transaction saved ✓');
+}
+
+function editTx(id) { const tx=DB.transactions.find(t=>t.id===id); if(!tx)return; showView('quick-add'); renderTxForm(tx); }
+function delTx(id) { if(!confirm('Delete this transaction?'))return; DB.transactions=DB.transactions.filter(t=>t.id!==id); save(); renderDashboard(); showToast('Deleted','error'); }
+function viewRcpt(id) { const tx=DB.transactions.find(t=>t.id===id); if(!tx||!tx.receipt)return; modal(`<div class="modal-hdr"><div class="modal-title">📷 Receipt — ${tx.desc}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div style="font-size:11px;color:#6b7090;margin-bottom:10px">${fmtD(tx.date)} · ${fmt(Math.abs(tx.amount))} · ${tx.taxCat}</div><img src="${tx.receipt}" style="width:100%;max-height:72vh;object-fit:contain;border-radius:8px"/>`,'modal-lg'); }
+
+// ═══ RECEIPT SCANNING ════════════════════════════════════════════
+function handleRcpt(input) {
+  const f = input.files[0]; if(!f) return;
+  if (f.size > 6*1024*1024) { showToast('Image must be under 6MB','error'); return; }
+  const r = new FileReader(); r.onload = ev=>scanReceipt(ev.target.result); r.readAsDataURL(f);
+}
+function dropRcpt(e) {
+  e.preventDefault(); document.querySelector('.receipt-zone')?.classList.remove('drag');
+  const f = e.dataTransfer.files[0]; if(!f||!f.type.startsWith('image/'))return;
+  const r = new FileReader(); r.onload = ev=>scanReceipt(ev.target.result); r.readAsDataURL(f);
+}
+function clearRcpt() {
+  document.getElementById('frcpt').value='';
+  document.getElementById('rcpt-area').innerHTML=`<div class="receipt-zone" onclick="triggerFile()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="dropRcpt(event)"><div style="font-size:28px;margin-bottom:6px">📷</div><div style="font-size:12px;color:#6b7090;margin-bottom:3px">Click here or drag a receipt image</div><div class="text-xs" style="color:#3a3f55">AI reads vendor, amount, date &amp; tax category automatically</div></div>`;
+}
+
+async function scanReceipt(dataUrl) {
+  // Show image immediately
+  document.getElementById('frcpt').value = dataUrl;
+  document.getElementById('rcpt-area').innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #2e3347;background:#0f1117;display:block;margin-bottom:8px"/><div style="font-size:11px;color:#d4af6a;text-align:center;padding:8px">⏳ AI reading receipt…</div>`;
+  document.getElementById('ai-overlay').style.display = 'flex';
+  try {
+    const b64 = dataUrl.split(',')[1], mt = dataUrl.split(';')[0].split(':')[1];
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:500,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mt,data:b64}},
+          {type:'text',text:`Extract from this receipt. Reply ONLY with valid JSON, no markdown:\n{"vendor":"store/vendor name","date":"YYYY-MM-DD or null","amount":0.00,"taxCat":"pick best from: ${TAX_CATS.join(', ')}","confidence":"high/medium/low","notes":"what was purchased in 5 words or less"}`}
+        ]}]
+      })
+    });
+    if (res.ok) {
+      const d = await res.json();
+      const txt = d.content.find(c=>c.type==='text')?.text||'{}';
+      const p = JSON.parse(txt.replace(/```json|```/g,'').trim());
+      document.getElementById('ai-overlay').style.display = 'none';
+      // Show confirm dialog
+      showAIConfirm(p, dataUrl);
+    } else {
+      document.getElementById('ai-overlay').style.display = 'none';
+      document.getElementById('rcpt-area').innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #2e3347;background:#0f1117;display:block;margin-bottom:8px"/><div class="flex gap-8"><button class="btn btn-ghost btn-sm" onclick="triggerFile()">🖼 Replace</button><button class="btn btn-red btn-sm" onclick="clearRcpt()">🗑 Remove</button></div>`;
+      showToast('Receipt saved — fill in details manually','info');
+    }
+  } catch(e) {
+    document.getElementById('ai-overlay').style.display = 'none';
+    document.getElementById('rcpt-area').innerHTML = `<img src="${dataUrl}" style="width:100%;max-height:200px;object-fit:contain;border-radius:8px;border:1px solid #2e3347;background:#0f1117;display:block;margin-bottom:8px"/><div class="flex gap-8"><button class="btn btn-ghost btn-sm" onclick="triggerFile()">🖼 Replace</button><button class="btn btn-red btn-sm" onclick="clearRcpt()">🗑 Remove</button></div>`;
+    showToast('Receipt saved — fill in details manually','info');
+  }
+}
+
+function showAIConfirm(p, dataUrl) {
+  const rows = [
+    ['Vendor / Description', p.vendor||'Not detected'],
+    ['Date', p.date||'Not detected'],
+    ['Amount', p.amount ? fmt(p.amount) : 'Not detected'],
+    ['Tax Category', p.taxCat||'Uncategorized'],
+    ['Notes', p.notes||''],
+    ['Confidence', p.confidence||'—'],
+  ];
+  modal(`
+    <div class="modal-hdr"><div class="modal-title">✨ AI Read Your Receipt</div><button class="btn btn-ghost btn-sm" onclick="applyAI(null);closeModal()">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <img src="${dataUrl}" style="width:100%;max-height:180px;object-fit:contain;border-radius:8px;border:1px solid #2e3347;background:#0f1117"/>
+      <div>
+        <div style="font-size:10px;color:#6b7090;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Extracted Details</div>
+        <div class="ai-confirm">
+          ${rows.filter(r=>r[1]).map(r=>`<div class="ai-confirm-row"><span class="text-dim text-xs">${r[0]}</span><span style="font-size:12px;color:#e8e0d0;font-weight:bold;text-align:right;max-width:140px">${r[1]}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#8a8fa8;margin-bottom:14px">Review the details above. Click <strong style="color:#d4af6a">Apply to Form</strong> to fill in the transaction, or close to enter manually.</div>
+    <div class="flex gap-8 justify-between">
+      <button class="btn btn-ghost" onclick="applyAI(null);closeModal()">Enter Manually</button>
+      <button class="btn btn-gold" onclick="applyAI(${JSON.stringify(p).replace(/'/g,'&apos;')});closeModal()">✓ Apply to Form</button>
+    </div>`,'modal-lg');
+}
+
+function applyAI(p) {
+  if (!p) return;
+  if (p.vendor && !document.getElementById('fdesc').value) document.getElementById('fdesc').value = p.vendor;
+  if (p.date) document.getElementById('fd').value = p.date;
+  if (p.amount) { document.getElementById('famt').value = Math.abs(p.amount).toFixed(2); document.getElementById('ft').value = p.taxCat==='Income'?'credit':'debit'; }
+  if (p.taxCat && TAX_CATS.includes(p.taxCat)) { document.getElementById('fcat').value = p.taxCat; showTaxHint(p.taxCat); }
+  if (p.notes && !document.getElementById('fnotes').value) document.getElementById('fnotes').value = p.notes;
+  showToast('Form filled from receipt ✓');
+}
+
+// ═══ RECEIPT VAULT ════════════════════════════════════════════════
+function renderReceipts() {
+  const withReceipts = DB.transactions.filter(t=>t.receipt).sort((a,b)=>b.date.localeCompare(a.date));
+  const total = withReceipts.reduce((s,t)=>s+Math.abs(t.amount),0);
+  document.getElementById('receipt-stats').innerHTML = [
+    {l:'Receipts Saved',v:withReceipts.length,c:'#d4af6a'},
+    {l:'Total Amount',v:fmt(total),c:'#4ade80'},
+    {l:'Missing Receipts',v:DB.transactions.filter(t=>!t.receipt&&t.amount<0).length,c:'#f87171'},
+  ].map(k=>`<div class="card flex-1" style="min-width:130px"><div class="text-xs text-dim">${k.l}</div><div style="font-size:18px;font-weight:bold;color:${k.c};margin-top:4px">${k.v}</div></div>`).join('');
+
+  if (!withReceipts.length) {
+    document.getElementById('receipt-grid').innerHTML = `<div class="card" style="text-align:center;padding:40px;color:#4a5070"><div style="font-size:36px;margin-bottom:8px">📷</div><div>No receipts yet. Add transactions with receipt photos and they'll appear here.</div></div>`;
+    return;
+  }
+  document.getElementById('receipt-grid').innerHTML = `<div class="receipt-grid">` +
+    withReceipts.map(tx=>`<div class="receipt-thumb" onclick="viewRcpt('${tx.id}')">
+      <img src="${tx.receipt}" alt="Receipt"/>
+      <div class="receipt-thumb-info">
+        <div style="color:#c8c0b0;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${tx.desc}</div>
+        <div style="color:#f87171;margin-top:2px">${fmt(Math.abs(tx.amount))}</div>
+        <div style="margin-top:2px">${fmtD(tx.date)}</div>
+        <div style="margin-top:2px"><span class="badge">${tx.taxCat}</span></div>
+      </div></div>`).join('') + `</div>`;
+}
+
+// ═══ ACCOUNTS ═════════════════════════════════════════════════════
+function renderAccounts() {
+  document.getElementById('accounts-list').innerHTML = DB.accounts.map(a=>{
+    const txs = DB.transactions.filter(t=>t.accountId===a.id);
+    const ti = txs.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+    const to = txs.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0);
+    const unrecon = txs.filter(t=>!t.reconciled).length;
+    return `<div class="card mb-12" style="border-left:3px solid ${a.color}">
+      <div class="flex justify-between items-center wrap gap-12">
+        <div><div style="font-size:15px;font-weight:bold;color:#e8e0d0;margin-bottom:2px">${a.name}</div>
+        <div class="text-sm text-dim">${a.institution} · ···${a.last4||''} · ${a.type}</div>
+        <div class="flex gap-12 mt-8">
+          <div><div class="text-xs text-dim">In</div><div class="text-sm text-green">${fmt(ti)}</div></div>
+          <div><div class="text-xs text-dim">Out</div><div class="text-sm text-red">${fmt(Math.abs(to))}</div></div>
+          <div><div class="text-xs text-dim">Txns</div><div class="text-sm text-gold">${txs.length}</div></div>
+          ${unrecon?`<div><div class="text-xs text-dim">Unmatched</div><div class="text-sm text-red">${unrecon}</div></div>`:''}
+        </div></div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:bold;color:${a.balance<0?'#f87171':'#4ade80'}">${fmt(a.balance)}</div>
+          ${a.type==='credit'&&a.limit?`<div class="text-xs text-dim">${fmt(a.limit-Math.abs(a.balance))} available</div>`:''}
+          <div class="flex gap-8 mt-8">
+            <button class="btn btn-ghost btn-sm" onclick="showAcctDetail('${a.id}')">View</button>
+            <button class="btn btn-red btn-sm" onclick="delAcct('${a.id}')">🗑</button>
+          </div>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+
+function showAcctDetail(id) {
+  const a = DB.accounts.find(x=>x.id===id); if(!a)return;
+  const txs = DB.transactions.filter(t=>t.accountId===id).sort((x,y)=>y.date.localeCompare(x.date));
+  const ti = txs.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const to = txs.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0);
+  modal(`<div class="modal-hdr"><div><div class="modal-title">${a.name}</div><div class="text-xs text-dim">${a.institution} ···${a.last4||''} · ${a.type}</div></div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div>
+  <div class="flex gap-12 wrap mb-16">${[['Balance',fmt(a.balance),a.balance>=0?'#4ade80':'#f87171'],['Total In',fmt(ti),'#4ade80'],['Total Out',fmt(Math.abs(to)),'#f87171']].map(([l,v,c])=>`<div class="card" style="flex:1;min-width:100px"><div class="text-xs text-dim">${l}</div><div style="font-size:16px;font-weight:bold;color:${c};margin-top:4px">${v}</div></div>`).join('')}</div>
+  ${txTable(txs,true)}`,'modal-lg');
+}
+
+function openAccountModal() {
+  // Step 1 — pick account type
+  modal(`
+    <div class="modal-hdr">
+      <div><div class="modal-title">Add New Account</div><div style="font-size:10px;color:#6b7090;margin-top:2px">Step 1 of 2 — What type of account?</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px">
+      <button class="wiz-acct-type-btn" onclick="openAccountDetails('checking')">
+        <div style="font-size:26px">🏧</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Checking Account</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Day-to-day business spending &amp; deposits</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="openAccountDetails('savings')">
+        <div style="font-size:26px">🐖</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Savings Account</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Reserve funds, tax savings account</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="openAccountDetails('credit')">
+        <div style="font-size:26px">💳</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Credit Card</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Business credit card</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="openAccountDetails('investment')">
+        <div style="font-size:26px">📈</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Investment Account</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Brokerage or retirement account</div></div>
+      </button>
+      <button class="wiz-acct-type-btn" onclick="openAccountDetails('loan')">
+        <div style="font-size:26px">🏦</div>
+        <div><div style="font-size:13px;font-weight:bold;color:#e8e0d0">Loan / Line of Credit</div><div style="font-size:11px;color:#6b7090;margin-top:2px">Business loan or line of credit</div></div>
+      </button>
+    </div>`);
+}
+
+function openAccountDetails(type) {
+  const meta = {
+    checking:{icon:'🏧',label:'Checking Account',balLabel:'Current Balance ($)',balHint:'Log into your bank to find your current balance. Enter 0 to start fresh.',limitShow:false},
+    savings:{icon:'🐖',label:'Savings Account',balLabel:'Current Balance ($)',balHint:'Log into your bank to find your current balance. Enter 0 to start fresh.',limitShow:false},
+    credit:{icon:'💳',label:'Credit Card',balLabel:'Current Balance Owed ($)',balHint:'Enter what you currently owe on this card. If fully paid off enter 0.',limitShow:true},
+    investment:{icon:'📈',label:'Investment Account',balLabel:'Current Value ($)',balHint:'Enter the current market value of this account.',limitShow:false},
+    loan:{icon:'🏦',label:'Loan / Line of Credit',balLabel:'Remaining Balance Owed ($)',balHint:'Enter how much you still owe on this loan.',limitShow:true},
+  }[type];
+  const cp = COLORS.map((c,i)=>`<div onclick="document.getElementById('fac').value='${c}';document.querySelectorAll('.cpick').forEach(d=>d.style.outline='none');this.style.outline='3px solid #e8e0d0'" class="cpick" style="width:26px;height:26px;border-radius:50%;background:${c};cursor:pointer;outline:${i===0?'3px solid #e8e0d0':'none'}"></div>`).join('');
+  modal(`
+    <div class="modal-hdr">
+      <div><div class="modal-title">${meta.icon} ${meta.label}</div><div style="font-size:10px;color:#6b7090;margin-top:2px">Step 2 of 2 — Account details</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="openAccountModal()">← Back</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="field-label">Bank / Institution Name</label>
+        <input class="field-input" id="fan-inst" placeholder="Chase, Capital One, Wells Fargo…"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Which bank or lender is this account with?</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Account Nickname</label>
+        <input class="field-input" id="fan-name" placeholder="e.g. Chase Business Checking…"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Give it a name you'll recognize on the dashboard</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Last 4 Digits of Account Number</label>
+        <input class="field-input" id="fan-last4" maxlength="4" placeholder="1234" style="letter-spacing:.2em"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Found on your card or bank statement</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">${meta.balLabel}</label>
+        <input class="field-input" type="number" step="0.01" id="fan-bal" placeholder="0.00"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">${meta.balHint}</div>
+      </div>
+      ${meta.limitShow ? `
+      <div class="form-group">
+        <label class="field-label">${type==='loan'?'Original Loan Amount / Credit Limit ($)':'Credit Limit ($)'}</label>
+        <input class="field-input" type="number" step="0.01" id="fan-limit" placeholder="10000"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">${type==='loan'?'The total amount of the loan or line of credit':'The maximum credit limit on this card'}</div>
+      </div>` : '<input type="hidden" id="fan-limit"/>'}
+      <div class="form-group">
+        <label class="field-label">Choose a Color for This Account</label>
+        <div class="flex gap-8 wrap">${cp}</div>
+        <input type="hidden" id="fac" value="${COLORS[0]}"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Color helps you identify this account at a glance</div>
+      </div>
+      <input type="hidden" id="fan-type" value="${type}"/>
+      <div class="flex gap-8 justify-between mt-8">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-gold" onclick="saveAcct()">Save Account ✓</button>
+      </div>
+    </div>`);
+}
+
+function saveAcct() {
+  const inst = document.getElementById('fan-inst').value.trim();
+  const name = document.getElementById('fan-name').value.trim();
+  const last4 = document.getElementById('fan-last4').value.trim();
+  const type = document.getElementById('fan-type').value;
+  const rawBal = parseFloat(document.getElementById('fan-bal').value) || 0;
+  const limit = parseFloat(document.getElementById('fan-limit')?.value) || undefined;
+  if (!inst) { showToast('Enter the bank name','error'); return; }
+  if (!name) { showToast('Give this account a nickname','error'); return; }
+  const isCredit = ['credit','loan'].includes(type);
+  const balance = isCredit ? -Math.abs(rawBal) : rawBal;
+  DB.accounts.push({id:uid(), name, type, institution:inst, last4, balance, limit, color:document.getElementById('fac').value||COLORS[0]});
+  save();
+  // Ask to add another
+  modal(`
+    <div style="text-align:center;padding:8px 0 16px">
+      <div style="font-size:40px;margin-bottom:10px">✅</div>
+      <div style="font-size:16px;font-weight:bold;color:#4ade80;margin-bottom:6px">${name} added!</div>
+      <div style="font-size:12px;color:#8a8fa8;margin-bottom:20px">Do you have another account to add?</div>
+      <div class="flex gap-8 justify-center">
+        <button class="btn btn-gold" onclick="openAccountModal()">+ Add Another Account</button>
+        <button class="btn btn-ghost" onclick="closeModal();renderAccounts();renderDashboard()">Done</button>
+      </div>
+    </div>`);
+  showToast(`${name} saved ✓`);
+}
+function delAcct(id) { if(!confirm('Delete account and all transactions?'))return; DB.accounts=DB.accounts.filter(a=>a.id!==id); DB.transactions=DB.transactions.filter(t=>t.accountId!==id); save();renderAccounts();renderDashboard();showToast('Deleted','error'); }
+
+// ═══ RECONCILE ════════════════════════════════════════════════════
+function renderReconUI() {
+  const sel = document.getElementById('recon-acct');
+  if(sel) sel.innerHTML = DB.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+}
+
+function detectBankFormat(headers) {
+  const h = headers.map(x=>x.toLowerCase().trim());
+  for (const [bank, fmt] of Object.entries(BANK_FORMATS)) {
+    const hasDate = fmt.date.some(d=>h.some(hh=>hh.includes(d)));
+    if (hasDate) return {bank, fmt};
+  }
+  return {bank:'generic', fmt:{date:['date'],desc:['description','memo'],amount:['amount'],debit:['debit'],credit:['credit']}};
+}
+
+function handleReconFile(input) {
+  const f = input.files[0]; if(!f)return;
+  const acctId = document.getElementById('recon-acct').value;
+  const r = new FileReader(); r.onload = ev=>reconcile(ev.target.result, acctId); r.readAsText(f);
+}
+
+function reconcile(csv, acctId) {
+  const rows = csv.trim().split('\n').map(l=>l.split(',').map(c=>c.replace(/^"|"$/g,'').trim()));
+  if (rows.length < 2) { showToast('Could not read CSV','error'); return; }
+  const hdrs = rows[0];
+  const {bank, fmt: bf} = detectBankFormat(hdrs);
+  const hi = h => hdrs.findIndex(x=>bf[h]?.some(k=>x.toLowerCase().includes(k)));
+  const dc=hi('date'), ac=hi('amount'), xc=hi('desc');
+  const debitC=hi('debit'), creditC=hi('credit');
+  if (dc<0) { showToast('Cannot find date column in CSV','error'); return; }
+
+  const stRows = rows.slice(1).filter(r=>r.length>1).map(r=>{
+    let amt;
+    if (debitC>=0 && creditC>=0) {
+      const deb = parseFloat(r[debitC]?.replace(/[$,\s]/g,'')||'0');
+      const cred = parseFloat(r[creditC]?.replace(/[$,\s]/g,'')||'0');
+      amt = cred > 0 ? cred : -deb;
+    } else if (ac>=0) {
+      amt = parseFloat(r[ac]?.replace(/[$,\s]/g,'')||'0');
+    }
+    return {date:r[dc]||'', desc:xc>=0?r[xc]:'', amount:amt};
+  }).filter(r=>!isNaN(r.amount)&&r.amount!==0);
+
+  const ledger = DB.transactions.filter(t=>t.accountId===acctId);
+  const matched=[], missing=[], unmatched=[];
+
+  stRows.forEach(st=>{
+    const found = ledger.find(lt=>Math.round(lt.amount*100)===Math.round(st.amount*100)&&Math.abs(new Date(st.date)-new Date(lt.date))<5*86400000);
+    if (found) { matched.push({st,lt:found}); if(!found.reconciled){found.reconciled=true;} }
+    else missing.push(st);
+  });
+  ledger.forEach(lt=>{ if(!stRows.find(st=>Math.round(lt.amount*100)===Math.round(st.amount*100)&&Math.abs(new Date(st.date)-new Date(lt.date))<5*86400000)) unmatched.push(lt); });
+  save();
+
+  const acct = DB.accounts.find(a=>a.id===acctId);
+  document.getElementById('recon-results').innerHTML = `
+  <div class="card">
+    <div style="font-size:13px;font-weight:bold;color:#e8e0d0;margin-bottom:4px">Results — ${acct?.name}</div>
+    <div style="font-size:10px;color:#6b7090;margin-bottom:16px">Detected bank format: <span style="color:#4ade80">${bank.toUpperCase()}</span> · ${stRows.length} rows in statement</div>
+    <div class="grid-3 mb-16">
+      <div class="card" style="background:#1a2a1a;border-color:#2a4a2a"><div class="text-xs text-dim">Matched</div><div style="font-size:24px;font-weight:bold;color:#4ade80;margin-top:4px">${matched.length}</div></div>
+      <div class="card" style="background:#2a1a1a;border-color:#4a1e1e"><div class="text-xs text-dim">In Bank — Not in Ledger</div><div style="font-size:24px;font-weight:bold;color:#f87171;margin-top:4px">${missing.length}</div></div>
+      <div class="card" style="background:#2a2010;border-color:#3a2a10"><div class="text-xs text-dim">In Ledger — Not in Bank</div><div style="font-size:24px;font-weight:bold;color:#d4af6a;margin-top:4px">${unmatched.length}</div></div>
+    </div>
+    ${matched.length?`<div style="color:#4ade80;font-size:11px;margin-bottom:12px">✅ ${matched.length} transaction${matched.length!==1?'s':''} reconciled and marked as matched</div>`:''}
+    ${missing.length?`<div style="font-size:11px;color:#f87171;margin-bottom:8px;font-weight:bold">⚠ Transactions in your bank statement not yet in ledger — tap + to import:</div>
+    ${missing.map((st,i)=>`<div class="import-row">
+      <div><div style="font-size:12px;color:#c8c0b0">${st.desc||'(no description)'}</div><div class="text-xs text-dim mt-8">${st.date}</div></div>
+      <div class="flex items-center gap-8">
+        <div style="font-weight:bold;color:${st.amount>=0?'#4ade80':'#f87171'};white-space:nowrap">${fmt(st.amount)}</div>
+        <button class="btn btn-gold btn-sm" onclick="importMissing(${i},'${acctId}')">+ Import</button>
+      </div></div>`).join('')}`:''}
+    ${unmatched.map(lt=>`<div class="recon-warn flex justify-between items-center gap-12"><div><div style="font-size:10px;color:#d4af6a;margin-bottom:2px">In ledger — not found in bank statement</div><div style="font-size:12px;color:#c8c0b0">${fmtD(lt.date)} · ${lt.desc}</div></div><div style="font-weight:bold;color:#d4af6a;white-space:nowrap">${fmt(lt.amount)}</div></div>`).join('')}
+  </div>`;
+  window._missingRows = missing;
+  showToast(`Matched ${matched.length} · ${missing.length} to import · ${unmatched.length} unmatched`);
+}
+
+function importMissing(idx, acctId) {
+  const st = window._missingRows[idx]; if(!st)return;
+  DB.transactions.unshift({id:uid(),date:st.date,desc:st.desc||'Imported from bank statement',amount:st.amount,type:st.amount>=0?'credit':'debit',accountId:acctId,taxCat:'Uncategorized',notes:'Imported from bank statement',receipt:null,vehicleId:null,reconciled:true});
+  save(); showToast('Transaction imported ✓');
+  window._missingRows.splice(idx,1);
+  // Refresh row
+  document.querySelectorAll('.import-row')[idx]?.remove();
+}
+
+// ═══ STATEMENTS ═══════════════════════════════════════════════════
+function renderStatements() {
+  document.getElementById('statements-grid').innerHTML = '<div class="grid-auto mb-20">' +
+  Array.from({length:CM+1},(_,i)=>i).map(mi=>{
+    const p = `${CY}-${String(mi+1).padStart(2,'0')}`;
+    const mt = DB.transactions.filter(t=>t.date.startsWith(p));
+    const mIn = mt.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+    const mOut = mt.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0);
+    const has = mt.length>0;
+    return `<div class="card flex justify-between items-center gap-12">
+      <div><div style="font-size:14px;font-weight:bold;color:#e8e0d0;margin-bottom:3px">${MONTHS[mi]}</div>
+      <div class="text-xs text-dim">${mt.length} transactions</div>
+      ${has?`<div class="flex gap-12 mt-8"><span class="text-sm text-green">+${fmt(mIn)}</span><span class="text-sm text-red">${fmt(mOut)}</span></div>`:''}
+      </div>
+      <button class="btn ${has?'btn-green':'btn-ghost'} btn-sm" ${!has?'disabled':''} onclick="${has?`dlMonth(${mi})`:'void 0'}">⬇ CSV</button>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function dlMonth(mi) { const p=`${CY}-${String(mi+1).padStart(2,'0')}`;dlCSV(DB.transactions.filter(t=>t.date.startsWith(p)).sort((a,b)=>a.date.localeCompare(b.date)),`Statement_${MONTHS[mi]}_${CY}.csv`);showToast(`Downloaded ${MONTHS[mi]} ${CY}`); }
+function exportFullYear() { const r=DB.transactions.filter(t=>t.date.startsWith(String(CY))).sort((a,b)=>a.date.localeCompare(b.date));if(!r.length){showToast('No transactions this year','error');return;}dlCSV(r,`Ledger_${CY}.csv`);showToast(`Downloaded Full Year ${CY}`); }
+function dlCSV(rows,fn) {
+  const am=Object.fromEntries(DB.accounts.map(a=>[a.id,a.name]));
+  const e=s=>`"${String(s||'').replace(/"/g,'""')}"`;
+  const lines=['Date,Description,Amount,Type,Account,Tax Category,Notes,Reconciled',...rows.map(t=>[t.date,e(t.desc),t.amount.toFixed(2),t.amount>=0?'Credit':'Debit',e(am[t.accountId]),e(t.taxCat),e(t.notes),t.reconciled?'Yes':'No'].join(',')),'',`"Total Credits",${rows.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0).toFixed(2)}`,`"Total Debits",${rows.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0).toFixed(2)}`,`"Net",${rows.reduce((s,t)=>s+t.amount,0).toFixed(2)}`];
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fn;a.click();URL.revokeObjectURL(url);
+}
+
+// ═══ TAXES ════════════════════════════════════════════════════════
+function renderTaxes() {
+  const sel=document.getElementById('tax-yr');
+  const yrs=[...new Set(DB.transactions.map(t=>t.date.slice(0,4)))];
+  if(!yrs.includes(String(CY)))yrs.push(String(CY));
+  yrs.sort().reverse();
+  if(sel)sel.innerHTML=yrs.map(y=>`<option value="${y}">${y}</option>`).join('');
+  const yr=sel?.value||String(CY);
+  const txs=DB.transactions.filter(t=>t.date.startsWith(yr));
+  const map={};txs.forEach(t=>{const c=t.taxCat||'Uncategorized';map[c]=(map[c]||0)+t.amount;});
+  const cats=Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0]));
+  const inc=map['Income']||0;
+  const ded=cats.filter(([c])=>!['Income','Transfer','Non-Deductible / Personal','Uncategorized'].includes(c)).reduce((s,[,v])=>s+v,0);
+  const net=inc+ded;
+  const ytdMi=DB.mileage.filter(m=>m.date.startsWith(yr)).reduce((s,m)=>s+m.miles,0);
+  document.getElementById('tax-kpis').innerHTML=[
+    {l:'Gross Revenue',v:fmt(inc),c:'#4ade80'},{l:'Total Deductions',v:fmt(Math.abs(ded)),c:'#f87171'},
+    {l:'Mileage Deduction',v:fmt(ytdMi*IRS_RATE),c:'#d4af6a'},{l:'Est. Net Profit',v:fmt(net),c:net>=0?'#4ade80':'#f87171'},
+    {l:'Total Transactions',v:txs.length,c:'#8a8fa8'},{l:'YTD Miles',v:ytdMi.toLocaleString()+' mi',c:'#d4af6a'},
+  ].map(k=>`<div class="card"><div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${k.l}</div><div style="font-size:18px;font-weight:bold;color:${k.c}">${k.v}</div></div>`).join('');
+  document.getElementById('tax-table').innerHTML=`<div style="font-size:13px;color:#d4af6a;margin-bottom:14px">Category Breakdown — ${yr}</div>
+  ${cats.length?`<table class="tbl"><thead><tr><th>Category</th><th>Total</th><th>IRS Note</th><th>vs Revenue</th></tr></thead><tbody>
+  ${cats.map(([cat,total])=>{const isI=cat==='Income';const pct=inc>0?Math.min(100,Math.abs(total)/inc*100):0;return`<tr>
+    <td><div class="flex items-center gap-8"><span class="dot" style="background:${isI?'#4ade80':total<0?'#f87171':'#8a8fa8'}"></span>${cat}</div></td>
+    <td style="font-weight:bold;color:${isI?'#4ade80':total<0?'#f87171':'#8a8fa8'};white-space:nowrap">${total<0?'-':'+'}${fmt(Math.abs(total))}</td>
+    <td style="font-size:10px;color:#6b7090;max-width:200px">${TAX_HINTS[cat]?.slice(0,60)||''}</td>
+    <td><div class="progress-bar" style="width:80px;display:inline-block;vertical-align:middle"><div class="progress-fill" style="width:${pct}%;background:${isI?'#4ade80':'#d4af6a'}"></div></div></td>
+  </tr>`;}).join('')}</tbody></table>`:'<div style="padding:20px;color:#4a5070;font-size:12px">No transactions for '+yr+'.</div>'}`;
+}
+
+// ═══ VEHICLES ════════════════════════════════════════════════════
+function renderVehicles() {
+  if(!DB.vehicles.length){document.getElementById('vehicles-list').innerHTML=`<div class="card" style="text-align:center;padding:40px;color:#4a5070"><div style="font-size:40px;margin-bottom:10px">🚗</div><div>Add vehicles to track mileage &amp; repairs</div></div>`;return;}
+  document.getElementById('vehicles-list').innerHTML=DB.vehicles.map(v=>{
+    const reps=DB.repairs.filter(r=>r.vehicleId===v.id);
+    const repCost=reps.reduce((s,r)=>s+r.cost,0);
+    const ytdMi=DB.mileage.filter(m=>m.vehicleId===v.id&&m.date.startsWith(String(CY))).reduce((s,m)=>s+m.miles,0);
+    const allMi=DB.mileage.filter(m=>m.vehicleId===v.id).reduce((s,m)=>s+m.miles,0);
+    return`<div class="card mb-12">
+      <div class="flex justify-between items-center wrap gap-12 mb-12">
+        <div><div style="font-size:15px;font-weight:bold;color:#e8e0d0">${v.year} ${v.make} ${v.model}</div><div class="text-sm text-dim">${v.plate?'Plate: '+v.plate:''} ${v.vin?'· VIN: '+v.vin:''}</div></div>
+        <div class="flex gap-8"><button class="btn btn-ghost btn-sm" onclick="openRepairModal('${v.id}')">+ Repair</button><button class="btn btn-red btn-sm" onclick="delVehicle('${v.id}')">🗑</button></div>
+      </div>
+      <div class="grid-3 mb-12">${[['YTD Miles',ytdMi.toLocaleString()+' mi','#d4af6a'],['YTD Deduction',fmt(ytdMi*IRS_RATE),'#4ade80'],['Total Miles',allMi.toLocaleString()+' mi','#8a8fa8'],['Repairs',reps.length,'#8a8fa8'],['Repair Cost',fmt(repCost),'#f87171']].map(([l,val,c])=>`<div class="card"><div class="text-xs text-dim">${l}</div><div style="font-size:14px;font-weight:bold;color:${c};margin-top:3px">${val}</div></div>`).join('')}</div>
+      ${reps.length?`<table class="tbl"><thead><tr><th>Date</th><th>Shop</th><th>Work Done</th><th>Odometer</th><th>Cost</th><th></th></tr></thead><tbody>${reps.slice().reverse().slice(0,5).map(r=>`<tr><td class="text-dim">${fmtD(r.date)}</td><td>${r.shop}</td><td style="color:#c8c0b0">${r.desc}</td><td class="text-dim">${r.odometer?r.odometer+' mi':'—'}</td><td style="color:#f87171;font-weight:bold">${fmt(r.cost)}</td><td><button class="btn btn-red btn-sm" onclick="delRepair('${r.id}')">🗑</button></td></tr>`).join('')}</tbody></table>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openVehicleModal(){modal(`<div class="modal-hdr"><div class="modal-title">Add Vehicle</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div style="display:flex;flex-direction:column;gap:14px"><div class="form-grid"><div class="form-group"><label class="field-label">Year</label><input class="field-input" id="fvy" maxlength="4" placeholder="2024"/></div><div class="form-group"><label class="field-label">Make</label><input class="field-input" id="fvmk" placeholder="Ford"/></div></div><div class="form-grid"><div class="form-group"><label class="field-label">Model</label><input class="field-input" id="fvmo" placeholder="F-150"/></div><div class="form-group"><label class="field-label">License Plate</label><input class="field-input" id="fvp" placeholder="ABC-1234"/></div></div><div class="form-group"><label class="field-label">VIN (optional)</label><input class="field-input" id="fvv" placeholder="1FTEW1EP…"/></div><div class="flex gap-8 justify-between"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="saveVehicle()">Save</button></div></div>`);}
+function saveVehicle(){const yr=document.getElementById('fvy').value.trim(),mk=document.getElementById('fvmk').value.trim(),mo=document.getElementById('fvmo').value.trim();if(!yr||!mk||!mo){showToast('Year, make, model required','error');return;}DB.vehicles.push({id:uid(),year:yr,make:mk,model:mo,plate:document.getElementById('fvp').value.trim(),vin:document.getElementById('fvv').value.trim()});save();closeModal();renderVehicles();showToast('Vehicle added');}
+function delVehicle(id){if(!confirm('Delete vehicle, mileage & repairs?'))return;DB.vehicles=DB.vehicles.filter(v=>v.id!==id);DB.mileage=DB.mileage.filter(m=>m.vehicleId!==id);DB.repairs=DB.repairs.filter(r=>r.vehicleId!==id);save();renderVehicles();showToast('Deleted','error');}
+function openRepairModal(vid){const v=DB.vehicles.find(x=>x.id===vid);modal(`<div class="modal-hdr"><div class="modal-title">Log Repair — ${v?.year} ${v?.make} ${v?.model}</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div style="display:flex;flex-direction:column;gap:14px"><div class="form-grid"><div class="form-group"><label class="field-label">Date</label><input class="field-input" type="date" id="frd" value="${new Date().toISOString().slice(0,10)}"/></div><div class="form-group"><label class="field-label">Cost ($)</label><input class="field-input" type="number" step="0.01" id="frc" placeholder="0.00"/></div></div><div class="form-group"><label class="field-label">Shop / Mechanic</label><input class="field-input" id="frs" placeholder="Jiffy Lube, Bob's Auto…"/></div><div class="form-group"><label class="field-label">Work Done</label><input class="field-input" id="frdesc" placeholder="Oil change, brake pads…"/></div><div class="form-grid"><div class="form-group"><label class="field-label">Odometer (miles)</label><input class="field-input" type="number" id="fro" placeholder="45000"/></div><div class="form-group"><label class="field-label">Charge to Account</label><select class="field-input" id="fra">${DB.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}</select></div></div><div class="flex gap-8 justify-between"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="saveRepair('${vid}')">Save Repair</button></div></div>`);}
+function saveRepair(vid){const cost=parseFloat(document.getElementById('frc').value),shop=document.getElementById('frs').value.trim(),desc=document.getElementById('frdesc').value.trim();if(!shop||!desc||isNaN(cost)){showToast('Fill all fields','error');return;}const odo=document.getElementById('fro').value;const acctId=document.getElementById('fra').value;const v=DB.vehicles.find(x=>x.id===vid);DB.repairs.push({id:uid(),vehicleId:vid,date:document.getElementById('frd').value,cost,shop,desc,odometer:odo||null});DB.transactions.unshift({id:uid(),date:document.getElementById('frd').value,desc:`Vehicle Repair — ${v?v.year+' '+v.make+' '+v.model:''}: ${shop} — ${desc}`,amount:-Math.abs(cost),type:'debit',accountId:acctId,taxCat:'Auto & Truck Expenses',vehicleId:vid,notes:odo?'Odometer: '+odo+' mi':'',receipt:null,reconciled:false});save();closeModal();renderVehicles();renderDashboard();showToast('Repair logged + transaction created ✓');}
+function delRepair(id){DB.repairs=DB.repairs.filter(r=>r.id!==id);save();renderVehicles();showToast('Deleted','error');}
+
+// ═══ MILEAGE ═════════════════════════════════════════════════════
+function renderMileage(){
+  const ytdMi=DB.mileage.filter(m=>m.date.startsWith(String(CY))).reduce((s,m)=>s+m.miles,0);
+  const allMi=DB.mileage.reduce((s,m)=>s+m.miles,0);
+  document.getElementById('mi-kpis').innerHTML=[{l:'YTD Miles',v:ytdMi.toLocaleString()+' mi',c:'#d4af6a'},{l:'YTD Deduction',v:fmt(ytdMi*IRS_RATE),c:'#4ade80'},{l:'Total Miles',v:allMi.toLocaleString()+' mi',c:'#8a8fa8'}].map(k=>`<div class="card"><div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${k.l}</div><div style="font-size:20px;font-weight:bold;color:${k.c}">${k.v}</div></div>`).join('');
+  const rows=DB.mileage.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('mi-table').innerHTML=`<div class="flex justify-between items-center mb-16"><div class="text-gold" style="font-size:13px">Trip Log</div><div class="text-xs text-dim">$${IRS_RATE}/mile</div></div>${rows.length?`<table class="tbl"><thead><tr><th>Date</th><th>Vehicle</th><th>From → To</th><th>Miles</th><th>Deduction</th><th>Purpose</th><th></th></tr></thead><tbody>${rows.map(m=>{const v=DB.vehicles.find(x=>x.id===m.vehicleId);return`<tr><td class="text-dim">${fmtD(m.date)}</td><td class="text-sm">${v?v.year+' '+v.make+' '+v.model:'—'}</td><td style="color:#c8c0b0;font-size:11px">${m.from||'—'} → ${m.to||'—'}</td><td style="color:#d4af6a;font-weight:bold">${m.miles}</td><td class="text-green">${fmt(m.miles*IRS_RATE)}</td><td class="text-dim text-sm">${m.purpose||'Business'}</td><td><button class="btn btn-red btn-sm" onclick="delMi('${m.id}')">🗑</button></td></tr>`;}).join('')}</tbody></table>`:'<div style="padding:20px;color:#4a5070;font-size:12px">No trips logged yet.</div>'}`;
+}
+function openMileageModal(){if(!DB.vehicles.length){showToast('Add a vehicle first','error');showView('vehicles');return;}const vo=DB.vehicles.map(v=>`<option value="${v.id}">${v.year} ${v.make} ${v.model}</option>`).join('');modal(`<div class="modal-hdr"><div class="modal-title">Log Business Trip</div><button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button></div><div style="display:flex;flex-direction:column;gap:14px"><div class="form-grid"><div class="form-group"><label class="field-label">Date</label><input class="field-input" type="date" id="fmd" value="${new Date().toISOString().slice(0,10)}"/></div><div class="form-group"><label class="field-label">Vehicle</label><select class="field-input" id="fmv">${vo}</select></div></div><div class="form-grid"><div class="form-group"><label class="field-label">From</label><input class="field-input" id="fmfr" placeholder="Starting point…"/></div><div class="form-group"><label class="field-label">To</label><input class="field-input" id="fmto" placeholder="Destination…"/></div></div><div class="form-grid"><div class="form-group"><label class="field-label">Miles</label><input class="field-input" type="number" step="0.1" id="fmmi" placeholder="0.0" oninput="const v=parseFloat(this.value)||0;document.getElementById('fmded').value=v?fmt(v*${IRS_RATE}):''"/></div><div class="form-group"><label class="field-label">Deduction (auto)</label><input class="field-input" id="fmded" readonly style="color:#4ade80"/></div></div><div class="form-group"><label class="field-label">Business Purpose</label><input class="field-input" id="fmpur" placeholder="Client visit, supply run, job site…"/></div><div class="flex gap-8 justify-between"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="saveMi()">Log Trip</button></div></div>`);}
+function saveMi(){const mi=parseFloat(document.getElementById('fmmi').value);if(isNaN(mi)||mi<=0){showToast('Enter valid miles','error');return;}DB.mileage.push({id:uid(),date:document.getElementById('fmd').value,vehicleId:document.getElementById('fmv').value,from:document.getElementById('fmfr').value,to:document.getElementById('fmto').value,miles:mi,purpose:document.getElementById('fmpur').value});save();closeModal();renderMileage();showToast(`${mi} miles logged — ${fmt(mi*IRS_RATE)} deduction`);}
+function delMi(id){DB.mileage=DB.mileage.filter(m=>m.id!==id);save();renderMileage();showToast('Deleted','error');}
+
+// ═══ UI HELPERS ═══════════════════════════════════════════════════
+function modal(html,cls=''){document.getElementById('mroot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal ${cls}">${html}</div></div>`;}
+function closeModal(){document.getElementById('mroot').innerHTML='';}
+function showToast(msg,type='success'){const t=document.getElementById('toast');document.getElementById('tdot').style.background=type==='error'?'#f87171':type==='info'?'#6b8eff':'#4ade80';document.getElementById('tmsg').textContent=msg;t.style.display='flex';clearTimeout(window._tt);window._tt=setTimeout(()=>t.style.display='none',3500);}
+function updateSBStats(){const el=document.getElementById('sb-stats');const needs1099=DB.vendors.filter(v=>vendorYTD(v.id,String(CY))>=600).length;if(el)el.innerHTML=`FY ${CY}<br>${DB.transactions.length} transactions<br>${DB.transactions.filter(t=>t.receipt).length} receipts saved<br>${DB.vendors.length} vendors${needs1099?' · <span style="color:#f87171">'+needs1099+' need 1099</span>':''}`;}
+
+
+
+// ═══ ONBOARDING WIZARD ═══════════════════════════════════════════
+let WIZ = { bizName:'', accounts:[], acctType:'checking' };
+const WIZ_COLORS = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2','#db2777','#059669','#ea580c'];
+const WIZ_TYPE_META = {
+  checking:{icon:'🏧',label:'Checking Account',balLabel:'Current Balance ($)',balHint:'Log into your bank to check your current balance.',limitShow:false},
+  savings:{icon:'🐖',label:'Savings Account',balLabel:'Current Balance ($)',balHint:'Log into your bank to check your current balance.',limitShow:false},
+  credit:{icon:'💳',label:'Credit Card',balLabel:'Current Balance Owed ($)',balHint:'Enter what you currently owe on this card. If paid off enter 0.',limitShow:true},
+  loan:{icon:'🏦',label:'Loan / Line of Credit',balLabel:'Remaining Balance Owed ($)',balHint:'Enter the remaining amount you owe on this loan.',limitShow:true},
+};
+
+function wizStep(n) {
+  document.querySelectorAll('[id^="wiz-"]').forEach(el=>{ if(/^wiz-\d+$/.test(el.id)) el.style.display='none'; });
+  const el = document.getElementById('wiz-'+n);
+  if (el) el.style.display='block';
+}
+
+function wizSkip() {
+  localStorage.setItem('lp_wizDone','1');
+  load();
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  boot();
+  showToast('Welcome to Ledger Pro!');
+}
+
+function wizSaveBizName() {
+  const name = document.getElementById('wiz-biz-name').value.trim();
+  if (name) { WIZ.bizName = name; localStorage.setItem('lp_bizName', name); }
+  wizStep(2);
+}
+
+function wizSelectType(type) {
+  WIZ.acctType = type;
+  const meta = WIZ_TYPE_META[type];
+  document.getElementById('wiz-type-icon').textContent = meta.icon;
+  document.getElementById('wiz-type-label').textContent = meta.label + ' Details';
+  document.getElementById('wiz-bal-label').textContent = meta.balLabel;
+  document.getElementById('wiz-bal-hint').textContent = meta.balHint;
+  document.getElementById('wiz-limit-group').style.display = meta.limitShow ? 'flex' : 'none';
+  // Populate color dots
+  const cd = document.getElementById('wiz-colors');
+  cd.innerHTML = WIZ_COLORS.map((c,i)=>`<div class="wiz-color-dot" onclick="document.getElementById('wiz-color').value='${c}';document.querySelectorAll('.wiz-color-dot').forEach(d=>d.style.outline='none');this.style.outline='3px solid #e8e0d0'" style="background:${c};outline:${i===0?'3px solid #e8e0d0':'none'}"></div>`).join('');
+  // Clear fields
+  ['wiz-bank','wiz-acct-name','wiz-last4','wiz-balance','wiz-limit'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('wiz-color').value = WIZ_COLORS[WIZ.accounts.length % WIZ_COLORS.length];
+  // Update account number label
+  document.getElementById('wiz-acct-num').textContent = WIZ.accounts.length + 1;
+  wizStep(4);
+}
+
+function wizSaveAccount() {
+  const bank = document.getElementById('wiz-bank').value.trim();
+  const name = document.getElementById('wiz-acct-name').value.trim();
+  const last4 = document.getElementById('wiz-last4').value.trim();
+  const rawBal = document.getElementById('wiz-balance').value;
+  if (!bank) { wizToast('Enter the bank name','error'); return; }
+  if (!name) { wizToast('Give this account a nickname','error'); return; }
+  const balance = parseFloat(rawBal) || 0;
+  const isCredit = ['credit','loan'].includes(WIZ.acctType);
+  const limit = isCredit ? (parseFloat(document.getElementById('wiz-limit').value)||undefined) : undefined;
+  const acct = {
+    id: uid(), name, type: WIZ.acctType, institution: bank, last4,
+    balance: isCredit ? -Math.abs(balance) : balance,
+    limit, color: document.getElementById('wiz-color').value || WIZ_COLORS[0]
+  };
+  WIZ.accounts.push(acct);
+  wizToast(`${name} saved! ✓`);
+  // Ask to add another
+  wizShowAddAnother();
+}
+
+function wizShowAddAnother() {
+  const count = WIZ.accounts.length;
+  document.querySelectorAll('[id^="wiz-"]').forEach(el=>{ if(/^wiz-\d+$/.test(el.id)) el.style.display='none'; });
+  const box = document.getElementById('wiz-3');
+  box.style.display = 'block';
+  // Update the header to show accounts added so far
+  const hdr = box.querySelector('[style*="text-align:center"]');
+  if (hdr) {
+    hdr.innerHTML = `<div style="font-size:28px;margin-bottom:6px">✅</div>
+    <div style="font-size:16px;color:#4ade80;font-weight:bold;margin-bottom:4px">${count} account${count!==1?'s':''} added!</div>
+    <div style="font-size:12px;color:#8a8fa8;margin-bottom:4px">Want to add another account?</div>`;
+  }
+}
+
+function wizFinish(withDrive) {
+  // Save all wizard accounts, removing sample data
+  DB.accounts = WIZ.accounts.length > 0 ? WIZ.accounts : [];
+  if (WIZ.accounts.length > 0) DB.transactions = [];
+  save();
+  const cid = document.getElementById('cid-input')?.value.trim();
+  if (withDrive && cid) { localStorage.setItem('lp_cid', cid); }
+  localStorage.setItem('lp_wizDone','1');
+  if (WIZ.bizName) localStorage.setItem('lp_bizName', WIZ.bizName);
+  // Show done screen
+  document.getElementById('wiz-done-biz').textContent = WIZ.bizName ? `Welcome, ${WIZ.bizName}!` : 'Your Ledger Pro is ready to use.';
+  const summary = document.getElementById('wiz-acct-summary');
+  if (WIZ.accounts.length) {
+    summary.innerHTML = `<div style="font-size:11px;color:#d4af6a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">${WIZ.accounts.length} Account${WIZ.accounts.length!==1?'s':''} Ready</div>` +
+    WIZ.accounts.map(a=>`<div style="background:#0f1117;border:1px solid #1e2235;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+      <div class="flex items-center gap-8"><span style="width:10px;height:10px;border-radius:50%;background:${a.color};display:inline-block"></span><span style="font-size:12px;color:#e8e0d0">${a.name}</span><span style="font-size:10px;color:#6b7090">${a.institution} ···${a.last4||''}</span></div>
+      <span style="font-size:13px;font-weight:bold;color:${a.balance<0?'#f87171':'#4ade80'}">${fmt(a.balance)}</span>
+    </div>`).join('');
+  } else {
+    summary.innerHTML = '<div style="font-size:12px;color:#6b7090;text-align:center;padding:12px">No accounts added — you can add them from the Accounts section.</div>';
+  }
+  wizStep(6);
+}
+
+function wizEnterApp() {
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  boot();
+  const cid = localStorage.getItem('lp_cid');
+  if (cid) { initGDrive(cid); document.getElementById('sync-btn').style.display='block'; }
+  const biz = localStorage.getItem('lp_bizName');
+  showToast(biz ? `Welcome to Ledger Pro, ${biz}! 🎉` : 'Welcome to Ledger Pro! 🎉');
+}
+
+function wizToast(msg, type='success') {
+  showToast(msg, type);
+}
+
+
+// ═══ VENDORS / 1099 ══════════════════════════════════════════════
+const THRESHOLD_1099 = 600;
+
+function renderVendors() {
+  const yr = String(CY);
+  const vendors = DB.vendors;
+
+  // KPIs
+  const needForm = vendors.filter(v => vendorYTD(v.id, yr) >= THRESHOLD_1099);
+  const missingEIN = vendors.filter(v => (!v.ein && !v.ssn) && vendorYTD(v.id, yr) > 0);
+  const totalPaid = vendors.reduce((s,v) => s + vendorYTD(v.id, yr), 0);
+
+  // 1099 alert banner
+  document.getElementById('vendor-1099-banner').innerHTML = needForm.length
+    ? `<div class="unrecon-banner" style="background:#2a1500;border-color:#6a3500;margin-bottom:16px">
+        <span class="alert-dot"></span>
+        <div><div style="font-size:12px;color:#f87171;font-weight:bold">${needForm.length} vendor${needForm.length!==1?'s':''} need a 1099-NEC for ${yr}</div>
+        <div style="font-size:10px;color:#8a8fa8;margin-top:2px">Payments of $600+ require a 1099-NEC filed with the IRS by January 31 →</div></div>
+       </div>` : '';
+
+  document.getElementById('vendor-kpis').innerHTML = [
+    {l:'Total Vendors', v:vendors.length, c:'#8a8fa8'},
+    {l:'Need 1099-NEC', v:needForm.length, c:needForm.length>0?'#f87171':'#4ade80'},
+    {l:'Missing EIN/SSN', v:missingEIN.length, c:missingEIN.length>0?'#d4af6a':'#4ade80'},
+    {l:'Total Paid YTD', v:fmt(totalPaid), c:'#d4af6a'},
+    {l:'1099 Threshold', v:'$600', c:'#8a8fa8'},
+    {l:'Filing Deadline', v:'Jan 31', c:'#8a8fa8'},
+  ].map(k=>`<div class="card"><div class="text-xs text-dim" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${k.l}</div><div style="font-size:18px;font-weight:bold;color:${k.c}">${k.v}</div></div>`).join('');
+
+  if (!vendors.length) {
+    document.getElementById('vendors-list').innerHTML = `<div class="card" style="text-align:center;padding:40px;color:#4a5070">
+      <div style="font-size:40px;margin-bottom:10px">👤</div>
+      <div style="font-size:13px;margin-bottom:6px">No vendors yet.</div>
+      <div style="font-size:11px">Add contractors, subcontractors, and vendors you pay throughout the year.<br/>The app will automatically flag anyone who needs a 1099-NEC.</div>
+    </div>`;
+    return;
+  }
+
+  document.getElementById('vendors-list').innerHTML = vendors.map(v => {
+    const ytd = vendorYTD(v.id, yr);
+    const needs1099 = ytd >= THRESHOLD_1099;
+    const missingInfo = !v.ein && !v.ssn;
+    const payments = DB.transactions.filter(t => t.vendorId === v.id && t.date.startsWith(yr)).sort((a,b)=>b.date.localeCompare(a.date));
+    return `<div class="card mb-12" style="border-left:3px solid ${needs1099?'#f87171':'#252836'}">
+      <div class="flex justify-between items-center wrap gap-12 mb-12">
+        <div>
+          <div class="flex items-center gap-8 mb-8">
+            <div style="font-size:15px;font-weight:bold;color:#e8e0d0">${v.name}</div>
+            ${needs1099?'<span class="badge badge-red">⚠ 1099 Required</span>':''}
+            ${missingInfo&&ytd>0?'<span class="badge" style="background:#2a2010;color:#d4af6a">Missing EIN/SSN</span>':''}
+          </div>
+          <div class="text-sm text-dim">${v.bizType||'Individual/Contractor'} ${v.ein?'· EIN: '+v.ein:''} ${v.ssn?'· SSN on file':''}</div>
+          <div class="text-sm text-dim">${v.email||''} ${v.phone?'· '+v.phone:''}</div>
+          ${v.address?`<div class="text-sm text-dim">${v.address}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:bold;color:${needs1099?'#f87171':'#e8e0d0'}">${fmt(ytd)}</div>
+          <div class="text-xs text-dim">paid YTD ${yr}</div>
+          <div style="margin-top:6px">
+            <div class="progress-bar" style="width:120px;display:inline-block">
+              <div class="progress-fill" style="width:${Math.min(100,ytd/THRESHOLD_1099*100)}%;background:${needs1099?'#f87171':'#d4af6a'}"></div>
+            </div>
+            <div class="text-xs text-dim" style="margin-top:2px">${needs1099?'Over $600 threshold':'$'+Math.max(0,THRESHOLD_1099-ytd).toFixed(0)+' under $600'}</div>
+          </div>
+          <div class="flex gap-8 mt-8 justify-end">
+            <button class="btn btn-ghost btn-sm" onclick="openVendorModal('${v.id}')">✏ Edit</button>
+            <button class="btn btn-red btn-sm" onclick="delVendor('${v.id}')">🗑</button>
+          </div>
+        </div>
+      </div>
+      ${payments.length?`
+      <div style="font-size:10px;color:#d4af6a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Payment History ${yr}</div>
+      <table class="tbl"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Account</th></tr></thead>
+      <tbody>${payments.map(p=>{const a=DB.accounts.find(x=>x.id===p.accountId);return`<tr>
+        <td class="text-dim">${fmtD(p.date)}</td>
+        <td style="color:#c8c0b0">${p.desc}</td>
+        <td style="color:#f87171;font-weight:bold">${fmt(Math.abs(p.amount))}</td>
+        <td class="text-sm text-dim">${a?a.name:'—'}</td>
+      </tr>`;}).join('')}</tbody></table>`:'<div style="font-size:11px;color:#4a5070;padding:8px 0">No payments linked yet. When adding a transaction, select this vendor from the Vendor dropdown.</div>'}
+    </div>`;
+  }).join('') + `
+  <div class="card" style="margin-top:8px">
+    <div class="flex justify-between items-center mb-12">
+      <div style="font-size:13px;color:#d4af6a">1099-NEC Report — ${yr}</div>
+      <button class="btn btn-green btn-sm" onclick="export1099()">⬇ Export for CPA</button>
+    </div>
+    <div style="font-size:11px;color:#8a8fa8;margin-bottom:12px">All vendors paid $600 or more this year. Hand this to your CPA or use it to file 1099-NECs by January 31.</div>
+    ${needForm.length ? `<table class="tbl"><thead><tr><th>Vendor</th><th>Type</th><th>EIN / SSN</th><th>Address</th><th>YTD Paid</th><th>1099 Required</th></tr></thead>
+    <tbody>${needForm.map(v=>`<tr>
+      <td style="color:#e8e0d0;font-weight:bold">${v.name}</td>
+      <td class="text-dim">${v.bizType||'Individual'}</td>
+      <td style="color:${(!v.ein&&!v.ssn)?'#f87171':'#4ade80'}">${v.ein?'EIN: '+v.ein:v.ssn?'SSN on file':'⚠ MISSING'}</td>
+      <td class="text-dim text-sm">${v.address||'⚠ Missing'}</td>
+      <td style="color:#f87171;font-weight:bold">${fmt(vendorYTD(v.id,yr))}</td>
+      <td><span class="badge badge-red">Yes — File by Jan 31</span></td>
+    </tr>`).join('')}</tbody></table>` : `<div style="color:#4ade80;font-size:12px">✅ No vendors have reached the $600 threshold yet for ${yr}.</div>`}
+  </div>`;
+}
+
+function vendorYTD(vendorId, yr) {
+  return DB.transactions
+    .filter(t => t.vendorId === vendorId && t.date.startsWith(yr) && t.amount < 0)
+    .reduce((s,t) => s + Math.abs(t.amount), 0);
+}
+
+function openVendorModal(editId='') {
+  const v = editId ? DB.vendors.find(x=>x.id===editId) : {};
+  modal(`
+    <div class="modal-hdr">
+      <div><div class="modal-title">${editId?'Edit':'Add'} Vendor / Contractor</div>
+      <div style="font-size:10px;color:#6b7090;margin-top:2px">Collect W-9 info before paying — required for 1099 filing</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="form-group">
+        <label class="field-label">Full Name or Business Name</label>
+        <input class="field-input" id="fv-name" value="${v.name||''}" placeholder="John Smith or Smith Plumbing LLC"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Exactly as it appears on their W-9</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Business Type</label>
+        <select class="field-input" id="fv-type">
+          <option value="Individual/Contractor" ${(v.bizType||'Individual/Contractor')==='Individual/Contractor'?'selected':''}>Individual / Sole Contractor</option>
+          <option value="LLC" ${v.bizType==='LLC'?'selected':''}>LLC</option>
+          <option value="Partnership" ${v.bizType==='Partnership'?'selected':''}>Partnership</option>
+          <option value="Corporation" ${v.bizType==='Corporation'?'selected':''}>Corporation (no 1099 needed)</option>
+          <option value="S-Corp" ${v.bizType==='S-Corp'?'selected':''}>S-Corp (no 1099 needed)</option>
+          <option value="Non-Profit" ${v.bizType==='Non-Profit'?'selected':''}>Non-Profit</option>
+        </select>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Corporations and S-Corps generally do not need a 1099</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="field-label">EIN (Business Tax ID)</label>
+          <input class="field-input" id="fv-ein" value="${v.ein||''}" placeholder="12-3456789"/>
+          <div style="font-size:10px;color:#6b7090;margin-top:4px">From their W-9 form</div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">SSN on File?</label>
+          <select class="field-input" id="fv-ssn">
+            <option value="" ${!v.ssn?'selected':''}>No SSN on file</option>
+            <option value="yes" ${v.ssn==='yes'?'selected':''}>Yes — SSN collected (W-9)</option>
+          </select>
+          <div style="font-size:10px;color:#6b7090;margin-top:4px">Never enter actual SSN — just confirm you have it</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Mailing Address</label>
+        <input class="field-input" id="fv-address" value="${v.address||''}" placeholder="123 Main St, City, State, ZIP"/>
+        <div style="font-size:10px;color:#6b7090;margin-top:4px">Required for mailing the 1099 form</div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="field-label">Email</label>
+          <input class="field-input" id="fv-email" type="email" value="${v.email||''}" placeholder="vendor@email.com"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Phone</label>
+          <input class="field-input" id="fv-phone" value="${v.phone||''}" placeholder="(555) 000-0000"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Notes</label>
+        <textarea class="field-input" id="fv-notes" rows="2" style="resize:vertical" placeholder="Trade, specialty, contact notes…">${v.notes||''}</textarea>
+      </div>
+      <div class="flex gap-8 justify-between mt-8">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-gold" onclick="saveVendor('${editId}')">Save Vendor ✓</button>
+      </div>
+    </div>`,'modal-lg');
+}
+
+function saveVendor(editId) {
+  const name = document.getElementById('fv-name').value.trim();
+  if (!name) { showToast('Vendor name required','error'); return; }
+  const v = {
+    id: editId||uid(), name,
+    bizType: document.getElementById('fv-type').value,
+    ein: document.getElementById('fv-ein').value.trim(),
+    ssn: document.getElementById('fv-ssn').value,
+    address: document.getElementById('fv-address').value.trim(),
+    email: document.getElementById('fv-email').value.trim(),
+    phone: document.getElementById('fv-phone').value.trim(),
+    notes: document.getElementById('fv-notes').value.trim(),
+  };
+  if (editId) DB.vendors = DB.vendors.map(x=>x.id===editId?v:x);
+  else DB.vendors.push(v);
+  save(); closeModal(); renderVendors();
+  showToast(editId?'Vendor updated ✓':'Vendor added ✓');
+}
+
+function delVendor(id) {
+  if (!confirm('Delete this vendor? Payments already linked to them will remain.')) return;
+  DB.vendors = DB.vendors.filter(v=>v.id!==id);
+  // unlink from transactions
+  DB.transactions = DB.transactions.map(t=>t.vendorId===id?{...t,vendorId:null}:t);
+  save(); renderVendors(); showToast('Vendor deleted','error');
+}
+
+function export1099() {
+  const yr = String(CY);
+  const needForm = DB.vendors.filter(v => vendorYTD(v.id, yr) >= THRESHOLD_1099);
+  if (!needForm.length) { showToast('No vendors have reached $600 threshold yet','error'); return; }
+  const e = s => `"${String(s||'').replace(/"/g,'""')}"`;
+  const lines = [
+    `1099-NEC Report — Tax Year ${yr}`,
+    `Generated: ${new Date().toLocaleDateString()}`,
+    `Threshold: $${THRESHOLD_1099}`,
+    '',
+    'Vendor Name,Business Type,EIN,SSN on File,Address,Email,Phone,Total Paid,1099 Required,Missing Info',
+    ...needForm.map(v => [
+      e(v.name), e(v.bizType), e(v.ein), e(v.ssn?'Yes':'No'),
+      e(v.address), e(v.email), e(v.phone),
+      vendorYTD(v.id,yr).toFixed(2),
+      'Yes',
+      e((!v.ein&&!v.ssn)?'MISSING EIN/SSN':(!v.address)?'MISSING ADDRESS':'Complete')
+    ].join(',')),
+    '',
+    `Total vendors requiring 1099: ${needForm.length}`,
+    `Total payments: ${fmt(needForm.reduce((s,v)=>s+vendorYTD(v.id,yr),0))}`,
+    '',
+    'REMINDER: File 1099-NEC forms by January 31. Send copy to vendor and IRS.',
+  ];
+  const blob = new Blob([lines.join('\n')],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`1099_Report_${yr}.csv`; a.click(); URL.revokeObjectURL(url);
+  showToast(`1099 report downloaded — ${needForm.length} vendors`);
+}
+
+// ═══ GOOGLE DRIVE ════════════════════════════════════════════════
+function initGDrive(cid){const s=document.createElement('script');s.src='https://apis.google.com/js/api.js';s.onload=()=>gapi.load('client:auth2',()=>gapi.client.init({clientId:cid,scope:'https://www.googleapis.com/auth/drive.appdata',discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']}).then(()=>{gapiReady=true;if(gapi.auth2.getAuthInstance().isSignedIn.get())loadFromDrive();else gapi.auth2.getAuthInstance().signIn().then(loadFromDrive).catch(()=>showToast('Google sign-in skipped','info'));}).catch(()=>showToast('Google Drive error — check Client ID','error')));document.head.appendChild(s);}
+async function syncDrive(){if(!gapiReady){showToast('Google Drive not connected','error');return;}try{const c=JSON.stringify(DB);const list=await gapi.client.drive.files.list({spaces:'appDataFolder',q:"name='lpro.json'"});if(list.result.files.length){await gapi.client.request({path:`/upload/drive/v3/files/${list.result.files[0].id}`,method:'PATCH',params:{uploadType:'media'},body:c});}else{const meta=JSON.stringify({name:'lpro.json',parents:['appDataFolder']});const b='lpb';await gapi.client.request({path:'/upload/drive/v3/files',method:'POST',params:{uploadType:'multipart'},headers:{'Content-Type':`multipart/related; boundary=${b}`},body:`--${b}\r\nContent-Type: application/json\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${c}\r\n--${b}--`});}showToast('Synced to Google Drive ☁');}catch(e){showToast('Drive sync failed','error');}}
+async function loadFromDrive(){if(!gapiReady)return;try{const list=await gapi.client.drive.files.list({spaces:'appDataFolder',q:"name='lpro.json'"});if(list.result.files.length){const f=await gapi.client.drive.files.get({fileId:list.result.files[0].id,alt:'media'});DB={...DB,...JSON.parse(f.body)};boot();showToast('Loaded from Google Drive ☁');}}catch(e){}}
+
+// ═══ PWA ══════════════════════════════════════════════════════════
+if('serviceWorker' in navigator){const sw=`const C='lp2';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['.']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});}
+
+// ═══ AUTO START ═══════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  const cid = localStorage.getItem('lp_cid');
+  const wizDone = localStorage.getItem('lp_wizDone');
+  const hasSave = !!localStorage.getItem('lpdb2');
+  if (wizDone || hasSave) {
+    // Returning user — skip wizard
+    load();
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    boot();
+    if(cid){ document.getElementById('sync-btn').style.display='block'; initGDrive(cid); }
+  } else {
+    // First time — show wizard
+    wizStep(0);
+  }
+});
+</script>
+</body>
+</html>
